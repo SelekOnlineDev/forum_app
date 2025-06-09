@@ -1,0 +1,122 @@
+[
+    {
+      "_id": "25464d70-9ade-46c2-aaef-f4d93e3f8167",
+      "userId": "abef0572-8f87-4f49-97c2-fd6a591a9194",
+      "question": "How does quantum entanglement enable teleportation of particles?",
+      "createdAt": "2021-06-09T12:26:03.258652"
+    },
+    {
+      "_id": "9653bc65-a6b9-4fa7-955a-6ca9e6ccaa8b",
+      "userId": "06d9fc13-35a6-49b6-9e01-fa55394180df",
+      "question": "Is time travel theoretically possible through wormholes?",
+      "createdAt": "2022-06-07T12:26:03.258721"
+    },
+    {
+      "_id": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+      "userId": "10691dfd-54d8-4026-881b-9a253c4b75fe",
+      "question": "What are the limits of faster-than-light travel?",
+      "createdAt": "2024-07-01T12:26:03.258855"
+    },
+    {
+      "_id": "3d62ba49-4a0c-4421-ab93-0e6d08433c00",
+      "userId": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+      "question": "Can quantum tunneling be used to transmit information instantly?",
+      "createdAt": "2020-01-04T12:26:03.258928"
+    },
+    {
+      "_id": "97c77368-d89a-489e-be91-dc33659a4c47",
+      "userId": "abef0572-8f87-4f49-97c2-fd6a591a9194",
+      "question": "How does the observer effect influence particle behavior?",
+      "createdAt": "2020-02-18T12:26:03.258969"
+    },
+    {
+      "_id": "e1ff097c-83bf-4a76-9b39-0df99cf51803",
+      "userId": "f47509e6-a726-466d-b5dc-cbca9e62ff07",
+      "question": "Can black holes be gateways to parallel universes?",
+      "createdAt": "2022-09-07T12:26:03.259017"
+    },
+    {
+      "_id": "13480ef0-437b-4bd6-8e9a-d4c4597f613a",
+      "userId": "e078b452-054e-48c3-bf07-3b9e8421402e",
+      "question": "What is the nature of quantum decoherence?",
+      "createdAt": "2022-02-09T12:26:03.259143"
+    },
+    {
+      "_id": "5644c1c8-a19f-404f-b884-dc60095deeac",
+      "userId": "22d82c43-21d6-45f4-89e1-70024e61855d",
+      "question": "How would relativity behave near a white hole?",
+      "createdAt": "2021-12-25T12:26:03.259190"
+    },
+    {
+      "_id": "9ac0688e-f9d1-49b0-92f8-0642c1724373",
+      "userId": "06d9fc13-35a6-49b6-9e01-fa55394180df",
+      "question": "Are tachyons real or just theoretical constructs?",
+      "createdAt": "2021-11-11T12:26:03.259316"
+    },
+    {
+      "_id": "045f4b78-4147-43c8-84c8-1990a6796473",
+      "userId": "a208afcf-aab5-4561-a41a-a26203535d84",
+      "question": "How could quantum superposition affect human consciousness?",
+      "createdAt": "2022-05-27T12:26:03.259356"
+    },
+    {
+      "_id": "9ae89c67-c87a-4a7a-8489-3cb161a3a8f6",
+      "userId": "10691dfd-54d8-4026-881b-9a253c4b75fe",
+      "question": "What would happen if we harness zero-point energy?",
+      "createdAt": "2021-06-21T12:26:03.259395"
+    },
+    {
+      "_id": "04e494eb-1c31-463d-8b37-161e47f9cc1a",
+      "userId": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+      "question": "Can the uncertainty principle be bypassed?",
+      "createdAt": "2023-07-14T12:26:03.259409"
+    },
+    {
+      "_id": "1da4df74-7d0f-49a0-bdbd-435ace5da914",
+      "userId": "faa18942-d1cf-4470-a6f2-d79e917c9f0a",
+      "question": "Could time dilation enable interstellar colonization?",
+      "createdAt": "2023-06-04T12:26:03.259431"
+    },
+    {
+      "_id": "0332c9a9-81b4-459e-a84e-c22cfce56c13",
+      "userId": "13a600bc-02f6-43c8-b00f-41908c10ed53",
+      "question": "How can information escape a black hole?",
+      "createdAt": "2025-06-09T12:26:03.259450"
+    },
+    {
+      "_id": "0c142019-d27d-4cdd-9635-078ec31b039c",
+      "userId": "a208afcf-aab5-4561-a41a-a26203535d84",
+      "question": "Is spacetime quantized at the Planck scale?",
+      "createdAt": "2024-06-13T12:26:03.259460"
+    },
+    {
+      "_id": "b4f62c8e-48c3-4185-ac2f-cb8f186f370a",
+      "userId": "28256fbc-4a90-4936-a716-f854b5c31c8e",
+      "question": "What are the quantum limits of computation?",
+      "createdAt": "2022-06-26T12:26:03.259472"
+    },
+    {
+      "_id": "4fddaba9-eebc-4a59-841b-b5e59e2fa5fa",
+      "userId": "0599df4e-25ee-49a7-874a-fa45018d8739",
+      "question": "Could we entangle objects on a macroscopic scale?",
+      "createdAt": "2024-07-18T12:26:03.259488"
+    },
+    {
+      "_id": "4cfd61a3-6d7f-4820-91be-a7a4fb39fcef",
+      "userId": "28256fbc-4a90-4936-a716-f854b5c31c8e",
+      "question": "How could gravity be unified with quantum mechanics?",
+      "createdAt": "2021-09-21T12:26:03.259503"
+    },
+    {
+      "_id": "24f97df3-f968-4261-a96d-a08f1f41b342",
+      "userId": "f47509e6-a726-466d-b5dc-cbca9e62ff07",
+      "question": "Does antimatter obey the same quantum laws?",
+      "createdAt": "2021-06-18T12:26:03.259517"
+    },
+    {
+      "_id": "48a797a9-67ce-4e99-8673-388c792fd09d",
+      "userId": "abef0572-8f87-4f49-97c2-fd6a591a9194",
+      "question": "What is the role of virtual particles in vacuum fluctuations?",
+      "createdAt": "2021-04-06T12:26:03.259536"
+    }
+  ]

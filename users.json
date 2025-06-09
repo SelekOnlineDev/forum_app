@@ -1,0 +1,142 @@
+[
+    {
+      "_id": "0599df4e-25ee-49a7-874a-fa45018d8739",
+      "name": "Jonas",
+      "email": "jonas@example.com",
+      "password": "hashedpassword100@",
+      "createdAt": "2020-06-09T12:26:03.256945"
+    },
+    {
+      "_id": "b5b8f682-2024-475f-9088-04bb8210f2d8",
+      "name": "Augustas",
+      "email": "augustas@example.com",
+      "password": "hashedpassword101@",
+      "createdAt": "2021-06-09T12:26:03.257021"
+    },
+    {
+      "_id": "a52a2765-75f2-4a5f-b28e-36fd5181ab43",
+      "name": "Anastasija",
+      "email": "anastasija@example.com",
+      "password": "hashedpassword102@",
+      "createdAt": "2020-06-09T12:26:03.257047"
+    },
+    {
+      "_id": "22d82c43-21d6-45f4-89e1-70024e61855d",
+      "name": "Sandra",
+      "email": "sandra@example.com",
+      "password": "hashedpassword103@",
+      "createdAt": "2020-06-09T12:26:03.257090"
+    },
+    {
+      "_id": "78e3a932-de15-422f-b8ff-0221e1e3dd41",
+      "name": "Edvinas",
+      "email": "edvinas@example.com",
+      "password": "hashedpassword104@",
+      "createdAt": "2021-06-09T12:26:03.257129"
+    },
+    {
+      "_id": "10691dfd-54d8-4026-881b-9a253c4b75fe",
+      "name": "Simona",
+      "email": "simona@example.com",
+      "password": "hashedpassword105@",
+      "createdAt": "2020-06-09T12:26:03.257156"
+    },
+    {
+      "_id": "06d9fc13-35a6-49b6-9e01-fa55394180df",
+      "name": "Irena",
+      "email": "irena@example.com",
+      "password": "hashedpassword106@",
+      "createdAt": "2021-01-09T12:26:03.257247"
+    },
+    {
+      "_id": "65e49c07-0c9c-47e3-a2bd-2fc6a4710d40",
+      "name": "Valdas",
+      "email": "valdas@example.com",
+      "password": "hashedpassword107@",
+      "createdAt": "2021-06-09T12:26:03.257823"
+    },
+    {
+      "_id": "13a600bc-02f6-43c8-b00f-41908c10ed53",
+      "name": "Dale",
+      "email": "dale9@example.com",
+      "password": "hashedpassword108@",
+      "createdAt": "2020-06-09T12:26:03.257859"
+    },
+    {
+      "_id": "f47509e6-a726-466d-b5dc-cbca9e62ff07",
+      "name": "Aurimas",
+      "email": "aurimas@example.com",
+      "password": "hashedpassword109@",
+      "createdAt": "2020-06-09T12:26:03.257918"
+    },
+    {
+      "_id": "a208afcf-aab5-4561-a41a-a26203535d84",
+      "name": "Angele",
+      "email": "angele@example.com",
+      "password": "hashedpassword110@",
+      "createdAt": "2020-06-09T12:26:03.257943"
+    },
+    {
+      "_id": "faa18942-d1cf-4470-a6f2-d79e917c9f0a",
+      "name": "Romas",
+      "email": "romas@example.com",
+      "password": "hashedpassword111@",
+      "createdAt": "2020-06-09T12:26:03.258050"
+    },
+    {
+      "_id": "27811e0c-aaf9-4535-825a-8d38f105f9dc",
+      "name": "Onute",
+      "email": "onute@example.com",
+      "password": "hashedpassword112",
+      "createdAt": "2020-06-09T12:26:03.258119"
+    },
+    {
+      "_id": "28256fbc-4a90-4936-a716-f854b5c31c8e",
+      "name": "Vytas",
+      "email": "vytas@example.com",
+      "password": "hashedpassword113@",
+      "createdAt": "2020-06-09T12:26:03.258192"
+    },
+    {
+      "_id": "b811e5f5-05d4-4a74-a375-7ac2db16b4ae",
+      "name": "Rimvydas",
+      "email": "rimvydas@example.com",
+      "password": "hashedpassword114@",
+      "createdAt": "2020-06-09T12:26:03.258222"
+    },
+    {
+      "_id": "e078b452-054e-48c3-bf07-3b9e8421402e",
+      "name": "Stase",
+      "email": "stase@example.com",
+      "password": "hashedpassword115@",
+      "createdAt": "2021-06-09T12:26:03.258430"
+    },
+    {
+      "_id": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+      "name": "Viktorija",
+      "email": "viktorija@example.com",
+      "password": "hashedpassword116@",
+      "createdAt": "2021-06-09T12:26:03.258481"
+    },
+    {
+      "_id": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+      "name": "Valentina",
+      "email": "valentina@example.com",
+      "password": "hashedpassword117@",
+      "createdAt": "2021-06-09T12:26:03.258493"
+    },
+    {
+      "_id": "abef0572-8f87-4f49-97c2-fd6a591a9194",
+      "name": "Stasys",
+      "email": "stasys@example.com",
+      "password": "hashedpassword118@",
+      "createdAt": "2021-06-09T12:26:03.258503"
+    },
+    {
+      "_id": "efdcd304-af76-492d-a0d4-ca6efeb823f7",
+      "name": "Fortunatas",
+      "email": "fortunatas@example.com",
+      "password": "hashedpassword119@",
+      "createdAt": "2020-06-09T12:26:03.258511"
+    }
+  ]
