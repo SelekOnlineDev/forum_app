@@ -1,44 +1,75 @@
-import { client } from '../index.js';
 import { ObjectId } from 'mongodb';
-
-const db = client.db(process.env.DB_NAME);
-const answers = db.collection('answers');
+import { getDb } from '../index.js';
 
 export const getAnswersByQuestionId = async (req, res) => {
-  const { id } = req.params;
-  const result = await answers.find({ questionId: id }).toArray();
-  res.json(result);
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const result = await db.collection('answers').find({ questionId: id }).toArray();
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('Error fetching answers:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 export const createAnswer = async (req, res) => {
-  const { id } = req.params;
-  const { content } = req.body;
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const { content } = req.body;
 
-  const newAnswer = {
-    questionId: id,
-    content,
-    creatorId: req.user.id,
-    createdAt: new Date(),
-  };
+    const newAnswer = {
+      questionId: id,
+      content,
+      creatorId: req.user?.id || null,
+      createdAt: new Date(),
+    };
 
-  await answers.insertOne(newAnswer);
-  res.status(201).json({ message: 'Answer created' });
+    await db.collection('answers').insertOne(newAnswer);
+    res.status(201).json({ message: 'Answer created' });
+  } catch (err) {
+    console.error('Error creating answer:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 export const updateAnswer = async (req, res) => {
-  const { id } = req.params;
-  const { content } = req.body;
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const { content } = req.body;
 
-  await answers.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: { content } }
-  );
+    const result = await db.collection('answers').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { content } }
+    );
 
-  res.json({ message: 'Answer updated' });
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    res.status(200).json({ message: 'Answer updated' });
+  } catch (err) {
+    console.error('Error updating answer:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 export const deleteAnswer = async (req, res) => {
-  const { id } = req.params;
-  await answers.deleteOne({ _id: new ObjectId(id) });
-  res.json({ message: 'Answer deleted' });
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+
+    const result = await db.collection('answers').deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    res.status(200).json({ message: 'Answer deleted' });
+  } catch (err) {
+    console.error('Error deleting answer:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
