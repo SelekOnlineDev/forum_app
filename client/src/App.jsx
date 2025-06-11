@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
+import { useEffect } from 'react';
 import { UserProvider } from './context/UserContext';
+import { useUser } from './context/UserContext';
 import { Header } from './components/organisms/Header';
 import { Footer } from './components/organisms/Footer';
 import { MainOutlet } from './components/MainOutlet';
@@ -20,6 +22,24 @@ const AppContainer = styled.div`
 `;
 
 function App() {
+  const { resetLogoutTimer } = useUser();
+
+  // Atstatau laikmatį kiekvieno puslapio užkrovimo metu  ir kiekvieną kartą kai vartotojas juda pelės žymekliu ar spaudžia klavišus
+  
+  useEffect(() => {
+    const resetTimer = () => {
+      resetLogoutTimer?.();
+    };
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+
+    return () => {
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+    };
+  }, [resetLogoutTimer]);
+
   return (
     <UserProvider>
       <Router>
