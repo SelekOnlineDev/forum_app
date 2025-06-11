@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import styled from 'styled-components';
 import { Button } from '../components/atoms/Button';
-import api from '../api';
+import api from '../services/api';
 
 const UserContainer = styled.div`
   max-width: 600px;

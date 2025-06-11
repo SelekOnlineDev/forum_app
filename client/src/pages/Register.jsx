@@ -3,7 +3,7 @@ import { useHistory } from 'react-router';
 import { Button } from '../components/atoms/Button';
 import { PasswordField } from '../components/molecules/PasswordField';
 import styled from 'styled-components';
-import api from '../api';
+import api from '../services/api';
 
 const RegisterContainer = styled.div`
   max-width: 400px;

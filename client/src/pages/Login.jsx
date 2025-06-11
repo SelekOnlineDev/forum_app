@@ -5,7 +5,7 @@ import { InputField } from '../components/molecules/InputField';
 import { PasswordField } from '../components/molecules/PasswordField';
 import { Button } from '../components/atoms/Button';
 import styled from 'styled-components';
-import api from '../api';
+import api from '../services/api';
 
 const LoginContainer = styled.div`
   max-width: 400px;
