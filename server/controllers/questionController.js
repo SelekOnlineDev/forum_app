@@ -4,7 +4,33 @@ import { getDb } from '../index.js';
 export const getAllQuestions = async (req, res) => {
   try {
     const db = await getDb();
-    const questions = await db.collection('questions').find().toArray();
+    const { search, filter, sort } = req.query;
+    
+    let query = {};
+    
+    if (search) {
+      query.$or = [
+        { question: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    if (filter === 'answered') {
+      query.answerCount = { $gt: 0 };
+    } else if (filter === 'unanswered') {
+      query.answerCount = { $eq: 0 };
+    }
+    
+    let sortOption = { createdAt: -1 };
+    if (sort === 'popular') {
+      sortOption = { answerCount: -1 };
+    }
+    
+    const questions = await db.collection('questions')
+      .find(query)
+      .sort(sortOption)
+      .toArray();
+      
     res.status(200).json(questions);
   } catch (err) {
     console.error('Error getting questions:', err);
