@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import jwt from 'jsonwebtoken';
 
 const UserContext = createContext();
 
@@ -16,14 +15,23 @@ export const UserProvider = ({ children }) => {
       try {
         // Dekoduoju JWT tokeną
 
-        const decoded = jwt.decode(token);
+        const baseUrl = token.split('.')[1];
+        const base = baseUrl.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+      );
         
         // Tikrinu ar tokenas nepasibaigęs
 
-        if (decoded.exp * 1000 < Date.now()) {
-          logout();
-          return;
-        }
+        const decoded = JSON.parse(jsonPayload);
+      
+          if (decoded.exp * 1000 < Date.now()) {
+            logout();
+            return;
+      }
         
         // Nustatau vartotojo duomenis
 
