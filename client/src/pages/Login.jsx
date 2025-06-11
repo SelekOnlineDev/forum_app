@@ -5,7 +5,7 @@ import { InputField } from '../components/molecules/InputField';
 import { PasswordField } from '../components/molecules/PasswordField';
 import { Button } from '../components/atoms/Button';
 import styled from 'styled-components';
-import api from '../services/api';
+import api from '../api';
 
 const LoginContainer = styled.div`
   max-width: 400px;
@@ -76,7 +76,7 @@ export const Login = () => {
       if (response.data.token) {
         login(response.data.token, response.data.user);
         setSuccess('Login successful! Redirecting...');
-        setTimeout(() => history.push('/forum'), 3000);
+        setTimeout(() => history.push('/forum'), 1500);
       }
     } catch (err) {
       if (err.response?.status === 401) {

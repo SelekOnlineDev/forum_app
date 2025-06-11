@@ -4,7 +4,9 @@ import { useUser } from '../context/UserContext';
 import { QuestionCard } from '../components/molecules/QuestionCard';
 import { SearchBar } from '../components/atoms/SearchBar';
 import { Button } from '../components/atoms/Button';
+import { Modal } from '../components/molecules/Modal';
 import styled from 'styled-components';
+import api from '../services/api';
 
 const ForumContainer = styled.div`
   max-width: 800px;
@@ -16,23 +18,28 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
 `;
 
 const Filters = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 `;
 
 const FilterButton = styled(Button)`
   background-color: ${({ active }) => active ? '#00ff00' : '#333'};
   color: ${({ active }) => active ? '#000' : '#00ff00'};
+  font-size: 0.9rem;
+  padding: 8px 15px;
 `;
 
 const QuestionsList = styled.div`
   display: grid;
-  gap: 15px;
+  gap: 20px;
 `;
 
 export const Forum = () => {
@@ -42,14 +49,14 @@ export const Forum = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState(null);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const url = `http://localhost:5500/api/questions?search=${searchTerm}&filter=${filter}&sort=${sort}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        setQuestions(data);
+        const response = await api.get(`/questions?search=${searchTerm}&filter=${filter}&sort=${sort}`);
+        setQuestions(response.data);
       } catch (error) {
         console.error('Error fetching questions:', error);
       }
@@ -66,6 +73,23 @@ export const Forum = () => {
     }
   };
 
+  const handleDeleteClick = (questionId) => {
+    setQuestionToDelete(questionId);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!questionToDelete) return;
+    
+    try {
+      await api.delete(`/questions/${questionToDelete}`);
+      setQuestions(questions.filter(q => q._id !== questionToDelete));
+      setDeleteModalOpen(false);
+    } catch (error) {
+      console.error('Delete failed:', error);
+    }
+  };
+
   return (
     <ForumContainer>
       <Header>
@@ -78,6 +102,7 @@ export const Forum = () => {
       <SearchBar onSearch={setSearchTerm} />
       
       <Filters>
+        <span style={{ color: '#00ff00', alignSelf: 'center' }}>Filter:</span>
         <FilterButton 
           active={filter === 'all'} 
           onClick={() => setFilter('all')}
@@ -96,10 +121,8 @@ export const Forum = () => {
         >
           Unanswered
         </FilterButton>
-      </Filters>
-      
-      <Filters>
-        <span>Sort by:</span>
+        
+        <span style={{ color: '#00ff00', alignSelf: 'center', marginLeft: '15px' }}>Sort:</span>
         <FilterButton 
           active={sort === 'newest'} 
           onClick={() => setSort('newest')}
@@ -119,10 +142,22 @@ export const Forum = () => {
           <QuestionCard 
             key={question._id} 
             question={question} 
+            onDelete={() => handleDeleteClick(question._id)}
+            isOwner={user && user.id === question.userId}
             onClick={() => history.push(`/question/${question._id}`)}
           />
         ))}
       </QuestionsList>
+      
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this question? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </ForumContainer>
   );
 };

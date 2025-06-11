@@ -56,7 +56,9 @@ function App() {
           
           <Switch>
             <Route path="/" render={({ location }) => {
+
               // Nustatau background pic pagal routus
+              
               let background = '';
               if (['/', '/login', '/register'].includes(location.pathname)) {
                 background = "url('/src/assets/matrix.jpg') no-repeat center center fixed";
