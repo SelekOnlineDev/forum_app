@@ -8,40 +8,45 @@ const UserContainer = styled.div`
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-`;
-
-const Section = styled.div`
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: #111;
+  background-color: #000;
   border: 1px solid #00ff00;
   border-radius: 4px;
 `;
 
+const Section = styled.section`
+  margin-bottom: 2rem;
+`;
+
 const Title = styled.h2`
   color: #00ff00;
+  border-bottom: 1px solid #00ff00;
+  padding-bottom: 0.5rem;
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
 `;
 
 const Label = styled.label`
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
   color: #00ff00;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 10px;
-  background-color: #000;
+  padding: 0.5rem;
+  background-color: #111;
   border: 1px solid #00ff00;
   color: #00ff00;
   font-family: 'Courier New', Courier, monospace;
 `;
 
-const PasswordToggle = styled.span`
+const PasswordWrapper = styled.div`
+  position: relative;
+`;
+
+const ToggleVisibility = styled.span`
   position: absolute;
   right: 10px;
   top: 10px;
@@ -49,48 +54,50 @@ const PasswordToggle = styled.span`
   color: #00ff00;
 `;
 
-const Error = styled.div`
+const ErrorMessage = styled.div`
   color: #ff0000;
-  margin-top: 5px;
+  margin-top: 0.5rem;
 `;
 
-const Success = styled.div`
+const SuccessMessage = styled.div`
   color: #00ff00;
-  margin-top: 10px;
+  margin-top: 0.5rem;
 `;
 
 export const User = () => {
-  const { user } = useUser();
+  const { user, updateUser, resetLogoutTimer } = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    resetLogoutTimer?.();
+    
     if (user) {
-      setName(user.name);
-      setEmail(user.email);
+      setName(user.name || '');
+      setEmail(user.email || '');
     }
-  }, [user]);
+  }, [user, resetLogoutTimer]);
 
-  const validatePassword = (password) => {
+  const validatePassword = (pwd) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-    return regex.test(password);
+    return regex.test(pwd);
   };
 
   const handleUpdateProfile = async () => {
     const newErrors = {};
     
-    if (!name) newErrors.name = 'Name is required';
-    if (!email) {
+    if (!name.trim()) newErrors.name = 'Name is required';
+    if (!email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = 'Invalid email format';
     }
     
     if (Object.keys(newErrors).length > 0) {
@@ -99,12 +106,22 @@ export const User = () => {
     }
     
     try {
-      await api.patch('/user/profile', { name, email });
-      setSuccess('Profile updated successfully!');
-      setIsEditing(false);
-      setErrors({});
+      const response = await api.patch('/api/user/profile', { name, email });
+      
+      if (response.status === 200) {
+        updateUser({ name, email });
+        setSuccess('Profile updated successfully');
+        setErrors({});
+        setIsEditing(false);
+        
+        // Išvalau pranešimą po 5 sekundžių
+
+        setTimeout(() => setSuccess(''), 5000);
+      }
     } catch (err) {
-      setErrors({ general: 'Failed to update profile' });
+      setErrors({ 
+        general: err.response?.data?.message || 'Failed to update profile' 
+      });
     }
   };
 
@@ -129,14 +146,26 @@ export const User = () => {
     }
     
     try {
-      await api.patch('/user/password', { currentPassword: password, newPassword });
-      setSuccess('Password changed successfully!');
-      setPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setErrors({});
+      const response = await api.patch('/api/user/password', {
+        currentPassword: password,
+        newPassword
+      });
+      
+      if (response.status === 200) {
+        setSuccess('Password changed successfully');
+        setPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setErrors({});
+        
+        // Išvalau pranešimą po 5 sekundžių
+
+        setTimeout(() => setSuccess(''), 5000);
+      }
     } catch (err) {
-      setErrors({ general: 'Failed to change password' });
+      setErrors({ 
+        general: err.response?.data?.message || 'Failed to change password' 
+      });
     }
   };
 
@@ -153,7 +182,7 @@ export const User = () => {
             onChange={(e) => setName(e.target.value)}
             disabled={!isEditing}
           />
-          {errors.name && <Error>{errors.name}</Error>}
+          {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
         </FormGroup>
         
         <FormGroup>
@@ -164,15 +193,23 @@ export const User = () => {
             onChange={(e) => setEmail(e.target.value)}
             disabled={!isEditing}
           />
-          {errors.email && <Error>{errors.email}</Error>}
+          {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
         </FormGroup>
         
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
         ) : (
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
             <Button onClick={handleUpdateProfile}>Save Changes</Button>
-            <Button variant="danger" onClick={() => setIsEditing(false)}>
+            <Button 
+              variant="danger" 
+              onClick={() => {
+                setIsEditing(false);
+                setName(user.name);
+                setEmail(user.email);
+                setErrors({});
+              }}
+            >
               Cancel
             </Button>
           </div>
@@ -182,44 +219,53 @@ export const User = () => {
       <Section>
         <Title>Change Password</Title>
         
-        <FormGroup style={{ position: 'relative' }}>
+        <FormGroup>
           <Label>Current Password</Label>
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <PasswordToggle onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? '🙈' : '👁️'}
-          </PasswordToggle>
-          {errors.password && <Error>{errors.password}</Error>}
+          <PasswordWrapper>
+            <Input
+              type={showPasswords ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter current password"
+            />
+            <ToggleVisibility onClick={() => setShowPasswords(!showPasswords)}>
+              {showPasswords ? '🙈' : '👁️'}
+            </ToggleVisibility>
+          </PasswordWrapper>
+          {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
         </FormGroup>
         
         <FormGroup>
           <Label>New Password</Label>
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-          {errors.newPassword && <Error>{errors.newPassword}</Error>}
+          <PasswordWrapper>
+            <Input
+              type={showPasswords ? 'text' : 'password'}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
+            />
+          </PasswordWrapper>
+          {errors.newPassword && <ErrorMessage>{errors.newPassword}</ErrorMessage>}
         </FormGroup>
         
         <FormGroup>
           <Label>Confirm New Password</Label>
-          <Input
-            type={showPassword ? 'text' : 'password'}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          {errors.confirmPassword && <Error>{errors.confirmPassword}</Error>}
+          <PasswordWrapper>
+            <Input
+              type={showPasswords ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+            />
+          </PasswordWrapper>
+          {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
         </FormGroup>
         
         <Button onClick={handleChangePassword}>Change Password</Button>
       </Section>
       
-      {success && <Success>{success}</Success>}
-      {errors.general && <Error>{errors.general}</Error>}
+      {success && <SuccessMessage>{success}</SuccessMessage>}
+      {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
     </UserContainer>
   );
 };

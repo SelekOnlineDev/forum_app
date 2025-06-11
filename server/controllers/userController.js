@@ -64,7 +64,7 @@ export const updateProfile = async (req, res) => {
     const userId = req.user.id;
 
     // Patikrinu ar email jau naudojamas ar ne
-    
+
     const existing = await users.findOne({ email, _id: { $ne: userId } });
     if (existing) {
       return res.status(400).json({ message: 'Email already in use' });
@@ -102,8 +102,8 @@ export const updatePassword = async (req, res) => {
 
     // Tikrinu slaptažodį
 
-    const match = await bcrypt.compare(currentPassword, user.password);
-    if (!match) {
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
       return res.status(401).json({ message: 'Invalid current password' });
     }
 

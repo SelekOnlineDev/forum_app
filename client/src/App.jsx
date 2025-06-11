@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { Router, Route, Switch, Redirect } from 'react-router';
+import { createBrowserHistory } from 'history';
 import { UserProvider } from './context/UserContext';
 import { useUser } from './context/UserContext';
 import { Header } from './components/organisms/Header';
@@ -13,49 +14,69 @@ import { Ask } from './pages/Ask';
 import { User } from './pages/User';
 import styled from 'styled-components';
 
+const history = createBrowserHistory();
+
 const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #000;
   color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
 `;
 
 function App() {
   const { resetLogoutTimer } = useUser();
 
-  // Atstatau laikmatį kiekvieno puslapio užkrovimo metu  ir kiekvieną kartą kai vartotojas juda pelės žymekliu ar spaudžia klavišus
-  
-  useEffect(() => {
-    const resetTimer = () => {
-      resetLogoutTimer?.();
-    };
+  // Automatinio atsijungimo valdymas
 
+  useEffect(() => {
+    const resetTimer = () => resetLogoutTimer?.();
+    
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
-
+    window.addEventListener('scroll', resetTimer);
+    window.addEventListener('click', resetTimer);
+    window.addEventListener('touchstart', resetTimer);
+    
     return () => {
       window.removeEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+      window.removeEventListener('click', resetTimer);
+      window.removeEventListener('touchstart', resetTimer);
     };
   }, [resetLogoutTimer]);
 
   return (
     <UserProvider>
-      <Router>
+      <Router history={history}>
         <AppContainer>
           <Header />
           
-          <Routes>
-            <Route path="/" element={<MainOutlet background="url('/src/assets/matrix.jpg')" />}>
-              <Route index element={<Home />} />
-              <Route path="login" element={<Login />} />
-              <Route path="register" element={<Register />} />
-              <Route path="forum" element={<Forum />} />
-              <Route path="ask" element={<Ask />} />
-              <Route path="user" element={<User />} />
-            </Route>
-          </Routes>
+          <Switch>
+            <Route path="/" render={({ location }) => {
+              // Nustatau background pic pagal routus
+              let background = '';
+              if (['/', '/login', '/register'].includes(location.pathname)) {
+                background = "url('/src/assets/matrix.jpg') no-repeat center center fixed";
+              }
+              
+              return (
+                <MainOutlet background={background}>
+                  <Switch location={location}>
+                    <Route exact path="/" component={Home} />
+                    <Route path="/login" component={Login} />
+                    <Route path="/register" component={Register} />
+                    <Route path="/forum" component={Forum} />
+                    <Route path="/ask" component={Ask} />
+                    <Route path="/user" component={User} />
+                    <Redirect to="/" />
+                  </Switch>
+                </MainOutlet>
+              );
+            }} />
+          </Switch>
           
           <Footer />
         </AppContainer>

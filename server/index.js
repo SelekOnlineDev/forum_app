@@ -9,6 +9,11 @@ import answerRoutes from './routes/answerRoutes.js';
 
 dotenv.config(); // .env su visais kintamaisiais veiks nepriklausomai nuo OS ar paleidimo metodo.
 
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not defined in .env file');
+  process.exit(1);
+};
+
 const app = express();
 const PORT = process.env.PORT || 5501;
 
