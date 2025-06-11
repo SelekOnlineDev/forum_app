@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid'
 import { getDb } from '../index.js';
 
 export const getAllQuestions = async (req, res) => {
@@ -16,9 +16,14 @@ export const createQuestion = async (req, res) => {
   try {
     const db = await getDb();
     const newQuestion = {
-      ...req.body,
-      createdAt: new Date(),
+      _id: uuidv4(),
+      userId: req.user.id, // Naudoju prisijungusio vartotojo ID
+      question: req.body.question,
+      createdAt: new Date().toISOString()
     };
+    if (!req.body.question || req.body.question.length < 4) {
+      return res.status(400).json({ message: 'Question too short' });
+}
     const result = await db.collection('questions').insertOne(newQuestion);
     res.status(201).json({ message: 'Question created', id: result.insertedId });
   } catch (err) {
@@ -30,10 +35,13 @@ export const createQuestion = async (req, res) => {
 export const getQuestionById = async (req, res) => {
   try {
     const db = await getDb();
-    const question = await db.collection('questions').findOne({ _id: new ObjectId(req.params.id) });
+    const question = await db.collection('questions').findOne({ _id: req.params.id });
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
-    }
+    } 
+    // if (question.userId !== req.user.id) {
+    //   return res.status(403).json({ message: 'Unautorized' });
+    // }
     res.status(200).json(question);
   } catch (err) {
     console.error('Error getting question by ID:', err);
@@ -44,7 +52,9 @@ export const getQuestionById = async (req, res) => {
 export const deleteQuestion = async (req, res) => {
   try {
     const db = await getDb();
-    const result = await db.collection('questions').deleteOne({ _id: new ObjectId(req.params.id) });
+    const questionId = req.params.id;
+    await db.collection('answers').deleteMany({ questionId: questionId }); // Ištrinu visus atsakymus, susijusius su šiuo klausimu
+    const result = await db.collection('questions').deleteOne({ _id: req.params.id }); // Ištrinu klausimą pagal ID
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'Question not found' });
     }
@@ -58,10 +68,22 @@ export const deleteQuestion = async (req, res) => {
 export const updateQuestion = async (req, res) => {
   try {
     const db = await getDb();
-    const { title, body } = req.body;
+    const { question: updatedQuestion } = req.body;
+
+     // Randu klausimą, pradedu savininko patikrinimą
+
+    const existingQuestion = await db.collection('questions').findOne({ _id: req.params.id });
+    if (!existingQuestion) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+     // Tikrinu ar vartotojas yra savininkas
+    if (existingQuestion.userId !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+    // Atnaujinu klausimą
     const result = await db.collection('questions').updateOne(
-      { _id: new ObjectId(req.params.id) },
-      { $set: { title, body } }
+      { _id: req.params.id },
+      { $set: { question: updatedQuestion } }
     );
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'Question not found' });

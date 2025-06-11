@@ -7,6 +7,27 @@
       "createdAt": "2022-12-12T00:00:00"
     },
     {
+      "_id": "g7h8i9j0-s1l2-3756-ghij-117890123456",
+      "questionId": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+      "userId": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+      "answer": "The Alcubierre drive concept shows how spacetime warping could theoretically achieve FTL without violating relativity.",
+      "createdAt": "2024-08-05T12:33:00"
+    },
+    {
+      "_id": "h8i9j0k1-l2m3-4567-hijk-678901234567",
+      "questionId": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+      "userId": "e078b452-054e-48c3-bf07-3b9e8421402e",
+      "answer": "Causality constraints from general relativity fundamentally limit information transfer to lightspeed.",
+      "createdAt": "2024-09-12T08:57:00"
+    },
+    {
+      "_id": "i9j0r1l2-m3n4-5678-ilkl-789032345673",
+      "questionId": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+      "userId": "27811e0c-aaf9-4535-825a-8d38f105f9dc",
+      "answer": "Quantum field theory suggests vacuum fluctuations could provide the negative energy needed for exotic propulsion.",
+      "createdAt": "2024-10-07T15:21:00"
+    },
+    {
       "_id": "36cf9a06-8436-4204-b5c1-f9d71f045189",
       "questionId": "0c142019-d27d-4cdd-9635-078ec31b039c",
       "userId": "27811e0c-aaf9-4535-825a-8d38f105f9dc",
@@ -14,11 +35,88 @@
       "createdAt": "2024-03-19T00:00:00"
     },
     {
+      "_id": "p2q3r4s5-t6u7-8901-pqrs-012345678901",
+      "questionId": "0c142019-d27d-4cdd-9635-078ec31b039c",
+      "userId": "efdcd304-af76-492d-a0d4-ca6efeb823f7",
+      "answer": "Loop quantum gravity predicts discrete spacetime structure at the Planck scale.",
+      "createdAt": "2024-08-25T09:58:00"
+    },
+    {
+      "_id": "q3r4s5t6-u7v8-9012-qrst-123456789012",
+      "questionId": "0c142019-d27d-4cdd-9635-078ec31b039c",
+      "userId": "78e3a932-de15-422f-b8ff-0221e1e3dd41",
+      "answer": "String theory suggests spacetime emerges from more fundamental degrees of freedom.",
+      "createdAt": "2024-09-10T13:22:00"
+    },
+    {
+      "_id": "r4s5t6u7-v8w9-0123-rstu-234567890123",
+      "questionId": "0c142019-d27d-4cdd-9635-078ec31b039c",
+      "userId": "10691dfd-54d8-4026-881b-9a253c4b75fe",
+      "answer": "Causal set theory proposes spacetime consists of discrete, causally-related events.",
+      "createdAt": "2024-10-18T07:35:00"
+    },
+    {
       "_id": "5f431b7b-1a21-4223-851a-84952362aa99",
       "questionId": "e1ff097c-83bf-4a76-9b39-0df99cf51803",
       "userId": "a208afcf-aab5-4561-a41a-a26203535d84",
       "answer": "While FTL travel violates known physics, warp bubbles are a speculative workaround.",
       "createdAt": "2024-12-20T00:00:00"
+    },
+    {
+      "_id": "p6q7r8s9-t0u1-2345-pqrs-456789012345",
+      "questionId": "e1ff097c-83bf-4a76-9b39-0df99cf51803",
+      "userId": "b5b8f682-2024-475f-9088-04bb8210f2d8",
+      "answer": "Black hole interior solutions might connect to white holes in distant spacetime regions.",
+      "createdAt": "2022-11-20T18:30:00"
+    },
+    {
+      "_id": "q7r8s9t0-u1v2-3456-qrst-567890123456",
+      "questionId": "e1ff097c-83bf-4a76-9b39-0df99cf51803",
+      "userId": "28256fbc-4a90-4936-a716-f854b5c31c8e",
+      "answer": "String theory suggests black holes could be portals to higher-dimensional branes.",
+      "createdAt": "2022-12-15T07:48:00"
+    },
+    {
+      "_id": "r8s9i0u1-v2w3-4577-rstu-678900234597",
+      "questionId": "e1ff097c-83bf-4a76-9b39-0df99cf51803",
+      "userId": "0599df4e-25ee-49a7-874a-fa45018d8739",
+      "answer": "The holographic principle implies black hole information is encoded on event horizon surfaces.",
+      "createdAt": "2023-01-22T12:15:00"
+    },
+    {
+      "_id": "b5c8d9e0-f1a2-4b3c-8d4e-5f6a7b8c9d0e",
+      "questionId": "4cfd61a3-6d7f-4820-91be-a7a4fb39fcef",
+      "userId": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+      "answer": "Quantum entanglement allows particles to share states instantaneously across space.",
+      "createdAt": "2023-03-15T00:00:00"
+    },
+    {
+      "_id": "y1z2a3b4-c5d6-7890-yzab-901234567890",
+      "questionId": "4cfd61a3-6d7f-4820-91be-a7a4fb39fcef",
+      "userId": "13a600bc-02f6-43c8-b00f-41908c10ed53",
+      "answer": "String theory suggests gravity emerges from closed string vibrations in higher dimensions.",
+      "createdAt": "2021-11-15T11:33:00"
+    },
+    {
+      "_id": "z2a3b4c5-d6e7-8901-zabc-012345678901",
+      "questionId": "4cfd61a3-6d7f-4820-91be-a7a4fb39fcef",
+      "userId": "a52a2765-75f2-4a5f-b28e-36fd5181ab43",
+      "answer": "Loop quantum gravity attempts unification through spin networks and discrete geometry.",
+      "createdAt": "2021-12-28T09:47:00"
+    },
+    {
+      "_id": "a3b4c5d6-e7f8-9012-abcd-123456789012",
+      "questionId": "4cfd61a3-6d7f-4820-91be-a7a4fb39fcef",
+      "userId": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+      "answer": "Emergent gravity theories propose spacetime geometry arises from quantum entanglement.",
+      "createdAt": "2022-01-30T14:18:00"
+    },
+    {
+      "_id": "c1d2e3f4-a5b6-7890-b1c2-d3e4f5g6h7i8",
+      "questionId": "9653bc65-a6b9-4fa7-955a-6ca9e6ccaa8b",
+      "userId": "0599df4e-25ee-49a7-874a-fa45018d8739",
+      "answer": "Quantum foam suggests spacetime is turbulent at the smallest scales.",
+      "createdAt": "2023-01-10T00:00:00"
     },
     {
       "_id": "7105e959-fb03-4854-9014-44c3bc887a9d",
@@ -35,11 +133,46 @@
       "createdAt": "2023-08-30T00:00:00"
     },
     {
+      "_id": "s5t6u7v8-w9x0-1234-stuv-345678901234",
+      "questionId": "b4f62c8e-48c3-4185-ac2f-cb8f186f370a",
+      "userId": "a208afcf-aab5-4561-a41a-a26203535d84",
+      "answer": "Quantum error rates set fundamental limits on quantum computer scalability and reliability.",
+      "createdAt": "2022-09-30T14:47:00"
+    },
+    {
+      "_id": "t6u7v8w9-x0y1-2345-tuvw-456789012345",
+      "questionId": "b4f62c8e-48c3-4185-ac2f-cb8f186f370a",
+      "userId": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+      "answer": "Topological quantum computing might overcome decoherence limitations through anyonic braiding.",
+      "createdAt": "2022-11-08T10:14:00"
+    },
+    {
+      "_id": "u7v8w9x0-y1z2-3456-uvwx-567890123456",
+      "questionId": "b4f62c8e-48c3-4185-ac2f-cb8f186f370a",
+      "userId": "faa18942-d1cf-4470-a6f2-d79e917c9f0a",
+      "answer": "The Church-Turing thesis might be violated by quantum algorithms like Shor's factoring method.",
+      "createdAt": "2022-12-22T16:38:00"
+    },
+    {
       "_id": "740ffec4-e39a-49ac-904f-1972b9d51c7b",
       "questionId": "0332c9a9-81b4-459e-a84e-c22cfce56c13",
       "userId": "b811e5f5-05d4-4a74-a375-7ac2db16b4ae",
       "answer": "Macroscopic entanglement faces decoherence but may be possible in superconductors.",
       "createdAt": "2023-11-13T00:00:00"
+    },
+    {
+      "_id": "n0o1p2q3-r4s5-6789-nopq-890123456789",
+      "questionId": "0332c9a9-81b4-459e-a84e-c22cfce56c13",
+      "userId": "65e49c07-0c9c-47e3-a2bd-2fc6a4710d40",
+      "answer": "Black hole complementarity suggests information is preserved on the event horizon surface.",
+      "createdAt": "2025-07-14T11:29:00"
+    },
+    {
+      "_id": "o1p2q3r4-s5t6-7890-opqr-901234567890",
+      "questionId": "0332c9a9-81b4-459e-a84e-c22cfce56c13",
+      "userId": "27811e0c-aaf9-4535-825a-8d38f105f9dc",
+      "answer": "Quantum error correction in black holes might preserve information through subtle correlations.",
+      "createdAt": "2025-08-02T16:43:00"
     },
     {
       "_id": "b4ee5bc1-34a7-419d-87ca-ef419cf702e9",
@@ -61,6 +194,27 @@
       "userId": "f47509e6-a726-466d-b5dc-cbca9e62ff07",
       "answer": "Wormholes require negative energy to remain stable, per quantum theory.",
       "createdAt": "2022-04-24T00:00:00"
+    },
+    {
+      "_id": "e1f2g3h4-i5j6-7890-efgh-901234567890",
+      "questionId": "9ae89c67-c87a-4a7a-8489-3cb161a3a8f6",
+      "userId": "abef0572-8f87-4f49-97c2-fd6a591a9194",
+      "answer": "Zero-point energy extraction would violate thermodynamic laws without external work input.",
+      "createdAt": "2021-08-15T16:52:00"
+    },
+    {
+      "_id": "g3h4i5j6-k7l8-9012-ghij-123456789012",
+      "questionId": "9ae89c67-c87a-4a7a-8489-3cb161a3a8f6",
+      "userId": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+      "answer": "Stochastic electrodynamics suggests zero-point fields could power advanced civilizations.",
+      "createdAt": "2021-10-30T09:18:00"
+    },
+    {
+      "_id": "f2g3h4i5-j6k7-8901-fghi-012345678901",
+      "questionId": "9ae89c67-c87a-4a7a-8489-3cb161a3a8f6",
+      "userId": "28256fbc-4a90-4936-a716-f854b5c31c8e",
+      "answer": "Casimir effect demonstrates extractable energy from vacuum fluctuations on microscopic scales.",
+      "createdAt": "2021-09-22T11:36:00"
     },
     {
       "_id": "878b5d50-ad0e-436b-9ef6-06ae7b6be47e",
@@ -98,11 +252,39 @@
       "createdAt": "2024-09-12T00:00:00"
     },
     {
+      "_id": "y5z6a7b8-c9d0-1234-yzab-345678901234",
+      "questionId": "9ac0688e-f9d1-49b0-92f8-0642c1724373",
+      "userId": "78e3a932-de15-422f-b8ff-0221e1e3dd41",
+      "answer": "Tachyons remain hypothetical - no experimental evidence supports faster-than-light particles.",
+      "createdAt": "2021-12-08T13:28:00"
+    },
+    {
+      "_id": "z6a7b8c9-d0e1-2345-zabc-456789012345",
+      "questionId": "9ac0688e-f9d1-49b0-92f8-0642c1724373",
+      "userId": "a52a2765-75f2-4a5f-b28e-36fd5181ab43",
+      "answer": "If tachyons existed, they would create causality paradoxes violating relativistic principles.",
+      "createdAt": "2022-01-14T08:55:00"
+    },
+    {
+      "_id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+      "questionId": "9ac0688e-f9d1-49b0-92f8-0642c1724373",
+      "userId": "efdcd304-af76-492d-a0d4-ca6efeb823f7",
+      "answer": "Quantum field theory allows for virtual tachyonic states in certain gauge theories.",
+      "createdAt": "2022-02-20T17:12:00"
+    },
+    {
       "_id": "76d15e3b-36d8-401b-9fdc-e403c43e2047",
       "questionId": "24f97df3-f968-4261-a96d-a08f1f41b342",
       "userId": "78e3a932-de15-422f-b8ff-0221e1e3dd41",
       "answer": "While FTL travel violates known physics, warp bubbles are a speculative workaround.",
       "createdAt": "2022-03-02T00:00:00"
+    },
+    {
+      "_id": "b4c5d6e7-f8g9-0123-bcde-234567890123",
+      "questionId": "24f97df3-f968-4261-a96d-a08f1f41b342",
+      "userId": "65e49c07-0c9c-47e3-a2bd-2fc6a4710d40",
+      "answer": "CPT theorem requires antimatter to follow identical quantum mechanical principles.",
+      "createdAt": "2021-08-14T16:25:00"
     },
     {
       "_id": "84b84ab5-bfc7-4422-8d43-8c3b2b1d9c4b",
@@ -126,6 +308,27 @@
       "createdAt": "2022-02-25T00:00:00"
     },
     {
+      "_id": "s9t0u1v2-w3x4-5678-stuv-789012345678",
+      "questionId": "13480ef0-437b-4bd6-8e9a-d4c4597f613a",
+      "userId": "faa18942-d1cf-4470-a6f2-d79e917c9f0a",
+      "answer": "Environmental decoherence destroys quantum coherence through thermodynamic irreversibility.",
+      "createdAt": "2022-04-18T10:25:00"
+    },
+    {
+      "_id": "t0u1v2w3-x4y5-6789-tuvw-890123456789",
+      "questionId": "13480ef0-437b-4bd6-8e9a-d4c4597f613a",
+      "userId": "13a600bc-02f6-43c8-b00f-41908c10ed53",
+      "answer": "Decoherence occurs when quantum systems become entangled with their macroscopic environment.",
+      "createdAt": "2022-05-30T14:52:00"
+    },
+    {
+      "_id": "u1v2w3x4-y5z6-7890-uvwx-901234567890",
+      "questionId": "13480ef0-437b-4bd6-8e9a-d4c4597f613a",
+      "userId": "a208afcf-aab5-4561-a41a-a26203535d84",
+      "answer": "The decoherence timescale depends on system size and coupling strength to the environment.",
+      "createdAt": "2022-06-25T16:38:00"
+    },
+    {
       "_id": "cb8549ae-792d-4081-9108-f1d57de26828",
       "questionId": "9653bc65-a6b9-4fa7-955a-6ca9e6ccaa8b",
       "userId": "faa18942-d1cf-4470-a6f2-d79e917c9f0a",
@@ -147,11 +350,53 @@
       "createdAt": "2023-10-06T00:00:00"
     },
     {
+    "_id": "g7h8i9j0-k1l2-3456-ghij-567890123456",
+    "questionId": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+    "userId": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+    "answer": "The Alcubierre drive concept shows how spacetime warping could theoretically achieve FTL without violating relativity.",
+    "createdAt": "2024-08-05T12:33:00"
+    },
+    {
+    "_id": "h8i9j0k1-l2k3-4564-hifk-678901234569",
+    "questionId": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+    "userId": "e078b452-054e-48c3-bf07-3b9e8421402e",
+    "answer": "Causality constraints from general relativity fundamentally limit information transfer to lightspeed.",
+    "createdAt": "2024-09-12T08:57:00"
+    },
+    {
+    "_id": "i9j0k1l2-m3n4-5678-ijkl-789012345678",
+    "questionId": "2f6727cf-242f-4f2c-9dde-024a32b496e9",
+    "userId": "27811e0c-aaf9-4535-825a-8d38f105f9dc",
+    "answer": "Quantum field theory suggests vacuum fluctuations could provide the negative energy needed for exotic propulsion.",
+    "createdAt": "2024-10-07T15:21:00"
+    },
+    {
       "_id": "b80fc087-c48d-4788-a25f-041658b46890",
       "questionId": "97c77368-d89a-489e-be91-dc33659a4c47",
       "userId": "b811e5f5-05d4-4a74-a375-7ac2db16b4ae",
       "answer": "Superposition means a particle exists in multiple states until observed.",
       "createdAt": "2022-02-09T00:00:00"
+    },
+    {
+    "_id": "m3n4o5p6-q7r8-9012-mnop-123456789012",
+    "questionId": "97c77368-d89a-489e-be91-dc33659a4c47",
+    "userId": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+    "answer": "The measurement problem reveals how conscious observation collapses quantum superposition states.",
+    "createdAt": "2020-05-12T16:55:00"
+    },
+    {
+    "_id": "n4o5p6q7-r8s9-0123-nopq-234567890123",
+    "questionId": "97c77368-d89a-489e-be91-dc33659a4c47",
+    "userId": "65e49c07-0c9c-47e3-a2bd-2fc6a4710d40",
+    "answer": "Many-worlds interpretation suggests observers split rather than collapse wavefunctions.",
+    "createdAt": "2020-06-08T09:17:00"
+    },
+    {
+    "_id": "o5p6q7r8-s9t0-1234-opqr-345678901234",
+    "questionId": "97c77368-d89a-489e-be91-dc33659a4c47",
+    "userId": "efdcd304-af76-492d-a0d4-ca6efeb823f7",
+    "answer": "Decoherence theory explains observation effects without requiring conscious involvement.",
+    "createdAt": "2020-07-14T13:42:00"
     },
     {
       "_id": "cbcf4f6a-8b25-4d6c-90b7-2c32e655c318",
@@ -196,11 +441,53 @@
       "createdAt": "2023-11-09T00:00:00"
     },
     {
+      "_id": "h4i5j6k7-l8m9-0123-hijk-234567890123",
+      "questionId": "04e494eb-1c31-463d-8b37-161e47f9cc1a",
+      "userId": "0599df4e-25ee-49a7-874a-fa45018d8739",
+      "answer": "Heisenberg's uncertainty principle is fundamental to quantum mechanics and cannot be bypassed.",
+      "createdAt": "2023-09-05T13:45:00"
+    },
+    {
+      "_id": "i5j6k7l8-m9n0-1234-ijkl-345678901234",
+      "questionId": "04e494eb-1c31-463d-8b37-161e47f9cc1a",
+      "userId": "f47509e6-a726-466d-b5dc-cbca9e62ff07",
+      "answer": "Quantum error correction might minimize but cannot eliminate fundamental quantum uncertainty.",
+      "createdAt": "2023-10-12T07:23:00"
+    },
+    {
+      "_id": "j6k7l8m9-n0o1-2345-jklm-456789012345",
+      "questionId": "04e494eb-1c31-463d-8b37-161e47f9cc1a",
+      "userId": "a52a2765-75f2-4a5f-b28e-36fd5181ab43",
+      "answer": "Weak measurement techniques allow partial information extraction without complete state collapse.",
+      "createdAt": "2023-11-18T15:57:00"
+    },
+    {
       "_id": "9abd9d79-384e-4c7d-a13b-208ea22e5ad5",
       "questionId": "1da4df74-7d0f-49a0-bdbd-435ace5da914",
       "userId": "faa18942-d1cf-4470-a6f2-d79e917c9f0a",
       "answer": "Vacuum fluctuations momentarily create and annihilate virtual particles.",
       "createdAt": "2024-06-11T00:00:00"
+    },
+    {
+      "_id": "k7l8m9n0-o1p2-3456-klmn-567890123456",
+      "questionId": "1da4df74-7d0f-49a0-bdbd-435ace5da914",
+      "userId": "06d9fc13-35a6-49b6-9e01-fa55394180df",
+      "answer": "Time dilation allows travelers to reach distant stars within human lifespans subjectively.",
+      "createdAt": "2023-08-20T12:44:00"
+    },
+     {
+      "_id": "l8m9n0o1-p2q3-4567-lmno-678901234567",
+      "questionId": "1da4df74-7d0f-49a0-bdbd-435ace5da914",
+      "userId": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+      "answer": "Relativistic rockets would need exponential energy increases for meaningful time dilation.",
+      "createdAt": "2023-09-15T08:31:00"
+    },
+    {
+      "_id": "m9n0o1p2-q3r4-5678-mnop-789012345678",
+      "questionId": "1da4df74-7d0f-49a0-bdbd-435ace5da914",
+      "userId": "b5b8f682-2024-475f-9088-04bb8210f2d8",
+      "answer": "Generation ships combined with time dilation effects could enable practical interstellar travel.",
+      "createdAt": "2023-10-28T14:16:00"
     },
     {
       "_id": "635d4b4e-e1ed-413e-ba7c-683a6ffe7aae",
@@ -215,6 +502,27 @@
       "userId": "22d82c43-21d6-45f4-89e1-70024e61855d",
       "answer": "Decoherence causes loss of quantum behavior due to environmental interaction.",
       "createdAt": "2024-06-21T00:00:00"
+    },
+    {
+      "_id": "v8w9x0y1-z2a3-4567-vwxy-678901234567",
+      "questionId": "4fddaba9-eebc-4a59-841b-b5e59e2fa5fa",
+      "userId": "06d9fc13-35a6-49b6-9e01-fa55394180df",
+      "answer": "SQUID devices demonstrate macroscopic quantum coherence in superconducting loops.",
+      "createdAt": "2024-09-05T12:51:00"
+    },
+    {
+      "_id": "w9x0y1z2-a3b4-5678-wxyz-789012345678",
+      "questionId": "4fddaba9-eebc-4a59-841b-b5e59e2fa5fa",
+      "userId": "b5b8f682-2024-475f-9088-04bb8210f2d8",
+      "answer": "Schrödinger cat states have been achieved with small molecular systems and photons.",
+      "createdAt": "2024-10-12T08:26:00"
+    },
+     {
+      "_id": "x0y1z2a3-b4c5-6789-xyza-890123456789",
+      "questionId": "4fddaba9-eebc-4a59-841b-b5e59e2fa5fa",
+      "userId": "e078b452-054e-48c3-bf07-3b9e8421402e",
+      "answer": "Macros copic entanglement faces the measurement problem - where does quantum behavior end?",
+      "createdAt": "2024-11-20T15:42:00"
     },
     {
       "_id": "47d752a6-e8db-438b-882f-2d91bcbf0578",
@@ -278,5 +586,26 @@
       "userId": "b811e5f5-05d4-4a74-a375-7ac2db16b4ae",
       "answer": "Decoherence causes loss of quantum behavior due to environmental interaction.",
       "createdAt": "2024-11-28T00:00:00"
+    },
+    {
+      "_id": "v2w3x4y5-z6a7-8901-vwxy-012345678901",
+      "questionId": "5644c1c8-a19f-404f-b884-dc60095deeac",
+      "userId": "06d9fc13-35a6-49b6-9e01-fa55394180df",
+      "answer": "White holes would violate the second law of thermodynamics by spontaneously decreasing entropy.",
+      "createdAt": "2022-02-28T11:14:00"
+    },
+    {
+      "_id": "w3x4y5z6-a7b8-9012-wxyz-123456789012",
+      "questionId": "5644c1c8-a19f-404f-b884-dc60095deeac",
+      "userId": "986d8067-2f63-48a9-bfc2-eec2da1bd3b4",
+      "answer": "Near white holes, time dilation effects would be reversed compared to black holes.",
+      "createdAt": "2022-03-15T09:47:00"
+    },
+    {
+      "_id": "x4y5z6a7-b8c9-0123-xyza-234567890123",
+      "questionId": "5644c1c8-a19f-404f-b884-dc60095deeac",
+      "userId": "c0807a15-cb9a-41bd-b1ab-919c11fa3763",
+      "answer": "Gravitational redshift near white holes would cause extreme blueshift of incoming radiation.",
+      "createdAt": "2022-04-10T15:33:00"
     }
   ]

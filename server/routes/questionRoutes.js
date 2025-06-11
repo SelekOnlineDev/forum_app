@@ -1,4 +1,5 @@
 import express from 'express';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 import {
   getAllQuestions,
   createQuestion,
@@ -10,9 +11,9 @@ import {
 const router = express.Router();
 
 router.get('/questions', getAllQuestions);
-router.post('/questions', createQuestion);
+router.post('/questions', authMiddleware, createQuestion);
 router.get('/questions/:id', getQuestionById);
-router.delete('/questions/:id', deleteQuestion);
-router.put('/:id', updateQuestion);
+router.delete('/questions/:id', authMiddleware, deleteQuestion);
+router.put('/questions/:id', authMiddleware, updateQuestion);
 
 export default router;

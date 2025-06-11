@@ -15,12 +15,20 @@ const PORT = process.env.PORT || 5501;
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
+// Serverio diagnostika: Middleware, kuris logina kiekvieną užklausą
+
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 const mongoURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER_PASSWORD}@${process.env.DB_CLUSTER}.${process.env.DB_CLUSTER_ID}.mongodb.net/?retryWrites=true&w=majority&appName=${process.env.DB_CLUSTER}`;
 const client = new MongoClient(mongoURI);
 
 let db = null;
 
 // Exportuojama funkcija, kuria naudojasi visi controlleriai
+
 export const getDb = async () => {
   if (!db) {
     try {
@@ -43,8 +51,16 @@ const startServer = async () => {
     app.use('/api', questionRoutes);
     app.use('/api', answerRoutes);
 
+    // Testinis maršrutas, kad patikrinti ar serveris veikia
+
+    app.get('/api/test', (req, res) => {
+     console.log('Test route reached!');
+     res.status(200).json({ message: 'Server is working!' });
+      });
+
+
     app.listen(PORT, () => {
-      console.log(`Server running on PORT:${PORT}`);
+      console.log(`Server running on PORT: ${PORT}`);
     });
   } catch (err) {
     console.error('Failed to start server:', err);

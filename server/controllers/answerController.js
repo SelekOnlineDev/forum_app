@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 import { getDb } from '../index.js';
 
 export const getAnswersByQuestionId = async (req, res) => {
@@ -20,10 +20,11 @@ export const createAnswer = async (req, res) => {
     const { content } = req.body;
 
     const newAnswer = {
+       _id: uuidv4(),
       questionId: id,
-      content,
-      creatorId: req.user?.id || null,
-      createdAt: new Date(),
+      answer: content,
+      userId: req.user.id, // Prisijungusio vartotojo ID
+      createdAt: new Date().toISOString(),
     };
 
     await db.collection('answers').insertOne(newAnswer);
@@ -40,14 +41,32 @@ export const updateAnswer = async (req, res) => {
     const { id } = req.params;
     const { content } = req.body;
 
+    // Pridedu savininko patikrinimą
+    
+    const answer = await db.collection('answers').findOne({ _id: id });
+
+    if (!answer) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    // Tikrinu ar vartotojas yra atsakymo savininkas
+
+    if (answer.userId !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
     const result = await db.collection('answers').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { content } }
+      { _id: id },
+      { $set: { answer: content } }
     );
+
+    // Patikrinu ar atsakymas buvo atnaujintas
 
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'Answer not found' });
     }
+
+    if (!id) return res.status(400).json({ message: 'Invalid ID' });
 
     res.status(200).json({ message: 'Answer updated' });
   } catch (err) {
@@ -61,11 +80,30 @@ export const deleteAnswer = async (req, res) => {
     const db = await getDb();
     const { id } = req.params;
 
-    const result = await db.collection('answers').deleteOne({ _id: new ObjectId(id) });
+    // Patikrinu savininką
+
+    const answer = await db.collection('answers').findOne({ _id: id }); //Patikrinimas, ar atsakymas egzistuoja
+    if (!answer) {
+      return res.status(404).json({ message: 'Answer not found' });
+    }
+
+    // Tikrinu ar vartotojas yra atsakymo savininkas ir turi teisę ištrinti
+
+    if (answer.userId !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized to delete this answer' });
+    }
+
+    const result = await db.collection('answers').deleteOne({ _id: id }); //Ištrinu atsakymą
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'Answer not found' });
-    }
+    } 
+
+    // Patikrinu ar atsakymas buvo ištrintas
+
+    if (!id) return res.status(400).json({ message: 'Invalid ID' });
+
+    // Atsakymas sėkmingai ištrintas
 
     res.status(200).json({ message: 'Answer deleted' });
   } catch (err) {
