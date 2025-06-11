@@ -55,3 +55,69 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const updateProfile = async (req, res) => {
+  try {
+    const db = await getDb();
+    const users = db.collection('users');
+    const { name, email } = req.body;
+    const userId = req.user.id;
+
+    // Patikrinu ar email jau naudojamas ar ne
+    
+    const existing = await users.findOne({ email, _id: { $ne: userId } });
+    if (existing) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    const result = await users.updateOne(
+      { _id: userId },
+      { $set: { name, email } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Profile updated' });
+  } catch (err) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  try {
+    const db = await getDb();
+    const users = db.collection('users');
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Randu vartotoją
+
+    const user = await users.findOne({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Tikrinu slaptažodį
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) {
+      return res.status(401).json({ message: 'Invalid current password' });
+    }
+
+    // Šifruoju naują slaptažodį
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await users.updateOne(
+      { _id: userId },
+      { $set: { password: hashed } }
+    );
+
+    res.status(200).json({ message: 'Password updated' });
+  } catch (err) {
+    console.error('Password update error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
