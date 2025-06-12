@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router';
-import { useHistory } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
-import { Button } from '../atoms/Button';
+import Button from '../atoms/Button';
 import styled from 'styled-components';
 
 const HeaderContainer = styled.header`
@@ -54,15 +53,19 @@ const UserGreeting = styled.span`
   }
 `;
 
-export const Header = () => {
+const Header = () => {
   const { user, logout } = useUser();
-  const history = useHistory();
+  const navigate = useNavigate();
   
   return (
     <HeaderContainer>
       <Logo>
         <Link to="/">Quantum Forum</Link>
       </Logo>
+      
+      <Button onClick={() => navigate('/ask')} size="medium">
+        Ask Question
+      </Button>
       
       <Navigation>
         {user ? (
@@ -92,3 +95,5 @@ export const Header = () => {
     </HeaderContainer>
   );
 };
+
+export default Header;

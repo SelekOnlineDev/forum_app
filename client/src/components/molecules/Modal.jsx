@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Button } from '../atoms/Button';
+import Button from '../atoms/Button';
 
 const Backdrop = styled.div`
   position: fixed;
@@ -43,7 +43,7 @@ const Actions = styled.div`
   gap: 15px;
 `;
 
-export const Modal = ({ 
+const Modal = ({ 
   isOpen, 
   onClose, 
   onConfirm, 
@@ -79,3 +79,5 @@ export const Modal = ({
     </Backdrop>
   );
 };
+
+export default Modal;

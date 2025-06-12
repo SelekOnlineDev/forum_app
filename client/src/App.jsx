@@ -1,20 +1,15 @@
 import React, { useEffect } from 'react';
-import { Router, Route, Switch, Redirect } from 'react-router';
-import { createBrowserHistory } from 'history';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
 import { useUser } from './context/UserContext';
-import { Header } from './components/organisms/Header';
-import { Footer } from './components/organisms/Footer';
-import { MainOutlet } from './components/MainOutlet';
-import { Home } from './pages/Home';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { Forum } from './pages/Forum';
-import { Ask } from './pages/Ask';
-import { User } from './pages/User';
+import MainOutlet from './components/MainOutlet';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Forum from './pages/Forum';
+import Ask from './pages/Ask';
+import User from './pages/User';
 import styled from 'styled-components';
-
-const history = createBrowserHistory();
 
 const AppContainer = styled.div`
   display: flex;
@@ -25,10 +20,11 @@ const AppContainer = styled.div`
   font-family: 'Courier New', Courier, monospace;
 `;
 
-function App() {
-  const { resetLogoutTimer } = useUser();
+  const AutoLogoutHandler = ({ children }) => {
 
   // Automatinio atsijungimo valdymas
+
+  const { resetLogoutTimer } = useUser();
 
   useEffect(() => {
     const resetTimer = () => resetLogoutTimer?.();
@@ -48,41 +44,29 @@ function App() {
     };
   }, [resetLogoutTimer]);
 
+    return children;
+  };
+
+function App() {
   return (
     <UserProvider>
-      <Router history={history}>
-        <AppContainer>
-          <Header />
-          
-          <Switch>
-            <Route path="/" render={({ location }) => {
-
-              // Nustatau background pic pagal routus
-              
-              let background = '';
-              if (['/', '/login', '/register'].includes(location.pathname)) {
-                background = "url('/src/assets/matrix.jpg') no-repeat center center fixed";
-              }
-              
-              return (
-                <MainOutlet background={background}>
-                  <Switch location={location}>
-                    <Route exact path="/" component={Home} />
-                    <Route path="/login" component={Login} />
-                    <Route path="/register" component={Register} />
-                    <Route path="/forum" component={Forum} />
-                    <Route path="/ask" component={Ask} />
-                    <Route path="/user" component={User} />
-                    <Redirect to="/" />
-                  </Switch>
-                </MainOutlet>
-              );
-            }} />
-          </Switch>
-          
-          <Footer />
-        </AppContainer>
-      </Router>
+      <AutoLogoutHandler>
+        <Router>
+          <AppContainer>
+            <Routes>
+              <Route element={<MainOutlet />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/forum" element={<Forum />} />
+                <Route path="/ask" element={<Ask />} />
+                <Route path="/user" element={<User />} />
+              </Route>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AppContainer>
+        </Router>
+      </AutoLogoutHandler>
     </UserProvider>
   );
 }

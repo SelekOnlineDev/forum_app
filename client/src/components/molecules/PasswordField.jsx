@@ -24,7 +24,7 @@ const ToggleVisibility = styled.span`
   color: #00ff00;
 `;
 
-export const PasswordField = ({ 
+const PasswordField = ({ 
   value, 
   onChange, 
   showPassword, 
@@ -45,3 +45,5 @@ export const PasswordField = ({
     </PasswordWrapper>
   );
 };
+
+export default PasswordField;

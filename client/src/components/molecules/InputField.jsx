@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Input } from '../atoms/Input';
+import Input from '../atoms/Input';
 
 const Container = styled.div`
   margin-bottom: 15px;
@@ -19,7 +19,7 @@ const ErrorText = styled.div`
   font-size: 0.9rem;
 `;
 
-export const InputField = ({ 
+const InputField = ({ 
   label, 
   type = 'text', 
   value, 
@@ -43,3 +43,5 @@ export const InputField = ({
     </Container>
   );
 };
+
+export default InputField;

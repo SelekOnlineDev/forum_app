@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router';
-import { Button } from '../components/atoms/Button';
+import { Link } from 'react-router-dom';
+import Button from '../components/atoms/Button';
 import styled from 'styled-components';
 
 const HomeContainer = styled.div`
@@ -54,7 +54,7 @@ const ActionButton = styled(Button)`
   padding: 15px 30px;
 `;
 
-export const Home = () => {
+const Home = () => {
   return (
     <HomeContainer>
       <TitleBox>
@@ -68,3 +68,5 @@ export const Home = () => {
     </HomeContainer>
   );
 };
+
+export default Home;

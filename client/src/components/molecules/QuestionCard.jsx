@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useUser } from '../../context/UserContext';
-import { Button } from '../atoms/Button';
+import Button from '../atoms/Button';
 
 const Card = styled.div`
   background-color: #000;
@@ -49,7 +49,7 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-export const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
+const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
   const { user } = useUser();
   const isAnswered = question.answerCount > 0;
   
@@ -82,3 +82,5 @@ export const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
     </Card>
   );
 };
+
+export default QuestionCard;

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router';
 import { useUser } from '../context/UserContext';
-import { InputField } from '../components/molecules/InputField';
-import { PasswordField } from '../components/molecules/PasswordField';
-import { Button } from '../components/atoms/Button';
+import InputField from '../components/molecules/InputField';
+import PasswordField from '../components/molecules/PasswordField';
+import Button from '../components/atoms/Button';
 import styled from 'styled-components';
-import api from '../api';
+import api from '../services/api';
 
 const LoginContainer = styled.div`
   max-width: 400px;
@@ -52,8 +51,7 @@ const SignupPrompt = styled.div`
   color: #00ff00;
 `;
 
-export const Login = () => {
-  const history = useHistory();
+const Login = () => {
   const { login } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -143,3 +141,5 @@ export const Login = () => {
     </LoginContainer>
   );
 };
+
+export default Login;

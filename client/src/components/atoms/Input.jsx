@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Input = styled.input`
+const Input = styled.input`
   width: 100%;
   padding: 10px;
   background-color: #111;
@@ -21,3 +21,5 @@ export const Input = styled.input`
     cursor: not-allowed;
   }
 `;
+
+export default Input;

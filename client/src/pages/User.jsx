@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import styled from 'styled-components';
-import { Button } from '../components/atoms/Button';
+import Button from '../components/atoms/Button';
 import api from '../services/api';
 
 const UserContainer = styled.div`
@@ -64,7 +64,7 @@ const SuccessMessage = styled.div`
   margin-top: 0.5rem;
 `;
 
-export const User = () => {
+const User = () => {
   const { user, updateUser, resetLogoutTimer } = useUser();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -269,3 +269,5 @@ export const User = () => {
     </UserContainer>
   );
 };
+
+export default User;

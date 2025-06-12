@@ -32,7 +32,7 @@ const Copyright = styled.p`
   margin: 0;
 `;
 
-export const Footer = () => {
+const Footer = () => {
   return (
     <FooterContainer>
       <SocialLinks>
@@ -48,3 +48,5 @@ export const Footer = () => {
     </FooterContainer>
   );
 };
+
+export default Footer;

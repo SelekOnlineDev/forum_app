@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { QuestionCard } from '../components/molecules/QuestionCard';
-import { SearchBar } from '../components/atoms/SearchBar';
-import { Button } from '../components/atoms/Button';
-import { Modal } from '../components/molecules/Modal';
+import QuestionCard from '../components/molecules/QuestionCard';
+import SearchBar from '../components/atoms/SearchBar';
+import Button from '../components/atoms/Button';
+import Modal from '../components/molecules/Modal';
 import styled from 'styled-components';
 import api from '../services/api';
 
@@ -42,9 +42,9 @@ const QuestionsList = styled.div`
   gap: 20px;
 `;
 
-export const Forum = () => {
+const Forum = () => {
   const { user } = useUser();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
@@ -66,11 +66,16 @@ export const Forum = () => {
   }, [searchTerm, filter, sort]);
 
   const handleAskQuestion = () => {
-    if (user) {
-      history.push('/ask');
+   if (user) {
+      navigate('/ask');
     } else {
-      history.push('/login');
+      navigate('/login');
     }
+  };
+
+  const handleEditQuestion = (questionId) => {
+  const question = questions.find(q => q._id === questionId);
+  navigate('/ask', { state: { questionToEdit: question } });
   };
 
   const handleDeleteClick = (questionId) => {
@@ -139,12 +144,13 @@ export const Forum = () => {
       
       <QuestionsList>
         {questions.map(question => (
-          <QuestionCard 
-            key={question._id} 
-            question={question} 
+          <QuestionCard
+            key={question._id}
+            question={question}
             onDelete={() => handleDeleteClick(question._id)}
+            onEdit={() => handleEditQuestion(question._id)}
             isOwner={user && user.id === question.userId}
-            onClick={() => history.push(`/question/${question._id}`)}
+            onClick={() => navigate(`/question/${question._id}`)}
           />
         ))}
       </QuestionsList>
@@ -161,3 +167,5 @@ export const Forum = () => {
     </ForumContainer>
   );
 };
+
+export default Forum;

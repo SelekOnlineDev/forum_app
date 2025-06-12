@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router';
-import { Button } from '../components/atoms/Button';
-import { PasswordField } from '../components/molecules/PasswordField';
+import Button from '../components/atoms/Button';
+import PasswordField from '../components/molecules/PasswordField';
 import styled from 'styled-components';
 import api from '../services/api';
 
@@ -58,8 +57,7 @@ const Success = styled.div`
   margin-top: 5px;
 `;
 
-export const Register = () => {
-  const history = useHistory();
+const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -210,3 +208,5 @@ export const Register = () => {
     </RegisterContainer>
   );
 };
+
+export default Register;

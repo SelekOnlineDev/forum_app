@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Button = styled.button`
+const Button = styled.button`
   background-color: ${({ variant }) => 
     variant === 'danger' ? '#ff0000' : '#00ff00'};
   color: #000;
@@ -20,3 +20,5 @@ export const Button = styled.button`
     border-color: #00ff00;
   }
 `;
+
+export default Button;
