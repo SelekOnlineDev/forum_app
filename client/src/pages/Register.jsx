@@ -6,7 +6,7 @@ import api from '../services/api';
 
 const RegisterContainer = styled.div`
   max-width: 400px;
-  margin: 0 auto;
+  margin: 6rem auto;
   padding: 20px;
   background-color: #000;
   border: 1px solid #00ff00;
@@ -48,7 +48,7 @@ const Checkbox = styled.input`
 `;
 
 const Error = styled.div`
-  color: #ff0000;
+  color: #666666;
   margin-top: 5px;
 `;
 
@@ -200,7 +200,6 @@ const Register = () => {
         <Button 
           variant="link" 
           onClick={() => history.push('/login')}
-          style={{ color: '#00ff00', textDecoration: 'underline' }}
         >
           Log In
         </Button>

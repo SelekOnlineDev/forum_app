@@ -6,7 +6,7 @@ body {
 }
 
 .matrix-bg {
-  background-image: url('/src/assets/matrix.jpg');
+  background-image: url('../src/assets/matrix.png');
   background-size: cover;
   background-position: center;
 }

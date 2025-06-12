@@ -22,7 +22,7 @@ const SocialLink = styled.a`
   transition: color 0.3s;
   
   &:hover {
-    color: #00cc66;
+    color: #666666;
   }
 `;
 
@@ -36,14 +36,14 @@ const Footer = () => {
   return (
     <FooterContainer>
       <SocialLinks>
-        <SocialLink href="#" aria-label="Facebook"><FaFacebook /></SocialLink>
-        <SocialLink href="#" aria-label="Twitter"><FaTwitter /></SocialLink>
-        <SocialLink href="#" aria-label="Instagram"><FaInstagram /></SocialLink>
-        <SocialLink href="#" aria-label="LinkedIn"><FaLinkedin /></SocialLink>
-        <SocialLink href="#" aria-label="TikTok"><FaTiktok /></SocialLink>
+        <SocialLink href="https://www.facebook.com/" aria-label="Facebook"><FaFacebook /></SocialLink>
+        <SocialLink href="https://x.com/" aria-label="Twitter"><FaTwitter /></SocialLink>
+        <SocialLink href="https://www.instagram.com/" aria-label="Instagram"><FaInstagram /></SocialLink>
+        <SocialLink href="https://www.linkedin.com/" aria-label="LinkedIn"><FaLinkedin /></SocialLink>
+        <SocialLink href="https://www.tiktok.com/en/" aria-label="TikTok"><FaTiktok /></SocialLink>
       </SocialLinks>
       <Copyright>
-        &copy; {new Date().getFullYear()} Quantum Physics Forum. All rights reserved.
+        &copy; {new Date().getFullYear()} Secret Quantum Forum. All rights reserved.
       </Copyright>
     </FooterContainer>
   );

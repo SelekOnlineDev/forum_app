@@ -8,6 +8,12 @@ import Modal from '../components/molecules/Modal';
 import styled from 'styled-components';
 import api from '../services/api';
 
+const PageContainer = styled.div`
+  background-image: url('/src/assets/matrix.png');
+  position: relative;
+  z-index: 1; 
+`;
+
 const ForumContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
@@ -23,6 +29,14 @@ const Header = styled.div`
   gap: 15px;
 `;
 
+const H2 = styled.h2`
+  border: 2px solid #00ff00;
+  border-radius: 4px;
+  flex-wrap: wrap;
+  padding: 0px 20px 0px 20px;
+  background-color: #000;
+`;
+
 const Filters = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -31,8 +45,8 @@ const Filters = styled.div`
 `;
 
 const FilterButton = styled(Button)`
-  background-color: ${({ active }) => active ? '#00ff00' : '#333'};
-  color: ${({ active }) => active ? '#000' : '#00ff00'};
+  background-color: ${({ active }) => active ? '#00ff00' : '#666666'};
+  color: ${({ active }) => active ? '#000' : '#000'};
   font-size: 0.9rem;
   padding: 8px 15px;
 `;
@@ -96,9 +110,12 @@ const Forum = () => {
   };
 
   return (
+    <PageContainer >
     <ForumContainer>
       <Header>
-        <h2>Quantum Physics Forum</h2>
+        <H2>
+          <h2>Quantum Physics Forum</h2>
+        </H2>
         <Button size="large" onClick={handleAskQuestion}>
           Ask Question
         </Button>
@@ -165,6 +182,7 @@ const Forum = () => {
         cancelText="Cancel"
       />
     </ForumContainer>
+    </PageContainer>
   );
 };
 

@@ -8,7 +8,7 @@ import api from '../services/api';
 
 const LoginContainer = styled.div`
   max-width: 400px;
-  margin: 2rem auto;
+  margin: 6rem auto;
   padding: 25px;
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #00ff00;
@@ -34,7 +34,7 @@ const FormGroup = styled.div`
 `;
 
 const ErrorMessage = styled.div`
-  color: #ff0000;
+  color: #666666;
   margin-top: 10px;
   text-align: center;
 `;
@@ -89,7 +89,7 @@ const Login = () => {
 
   return (
     <LoginContainer>
-      <Title>Login to Quantum Forum</Title>
+      <Title>Login to Secret Forum</Title>
       
       <form onSubmit={handleSubmit}>
         <FormGroup>
@@ -133,7 +133,6 @@ const Login = () => {
         <Button 
           variant="link" 
           onClick={() => history.push('/register')}
-          style={{ color: '#00ff00', textDecoration: 'underline' }}
         >
           Sign Up
         </Button>

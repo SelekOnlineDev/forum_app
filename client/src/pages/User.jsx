@@ -4,6 +4,12 @@ import styled from 'styled-components';
 import Button from '../components/atoms/Button';
 import api from '../services/api';
 
+const AllContainer = styled.div`
+  background-image: url('/src/assets/matrix.png');
+  /* height: 100vh; */
+  padding: 20px 20px 20px 20px;
+`;
+
 const UserContainer = styled.div`
   max-width: 600px;
   margin: 0 auto;
@@ -55,7 +61,7 @@ const ToggleVisibility = styled.span`
 `;
 
 const ErrorMessage = styled.div`
-  color: #ff0000;
+  color: #666666;
   margin-top: 0.5rem;
 `;
 
@@ -170,6 +176,7 @@ const User = () => {
   };
 
   return (
+    <AllContainer>
     <UserContainer>
       <Section>
         <Title>User Profile</Title>
@@ -225,11 +232,11 @@ const User = () => {
             <Input
               type={showPasswords ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}  
               placeholder="Enter current password"
             />
             <ToggleVisibility onClick={() => setShowPasswords(!showPasswords)}>
-              {showPasswords ? '🙈' : '👁️'}
+              {showPasswords ? '👁️' : '🙈'}
             </ToggleVisibility>
           </PasswordWrapper>
           {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
@@ -267,6 +274,7 @@ const User = () => {
       {success && <SuccessMessage>{success}</SuccessMessage>}
       {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
     </UserContainer>
+    </AllContainer>
   );
 };
 

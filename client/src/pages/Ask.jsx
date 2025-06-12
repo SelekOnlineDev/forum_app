@@ -7,11 +7,18 @@ import api from '../services/api';
 import { useUser } from '../context/UserContext';
 
 const Container = styled.div`
+   background-image: url('/src/assets/matrix.png');
+   padding: 120px;
+   margin: 0;
+   height: 70vh;
+  `;
+
+const AskContainer = styled.div`
   max-width: 800px;
-  margin: 2rem auto;
+  margin: 0rem auto;
   padding: 25px;
   background-color: rgba(0, 0, 0, 0.8);
-  border: 1px solid #00ff00;
+  border: 2px solid #00ff00;
   border-radius: 4px;
 `;
 
@@ -71,28 +78,30 @@ const Ask = () => {
 
   return (
     <Container>
-      <Title>{questionToEdit ? 'Edit Question' : 'Ask a Question'}</Title>
-      
-      <form onSubmit={handleSubmit}>
-        <InputField
-          label="Question"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Enter your question"
-          error={error}
-        />
+      <AskContainer>
+        <Title>{questionToEdit ? 'Edit Question' : 'Ask a Question'}</Title>
         
-        {success && <div style={{ color: '#00ff00', margin: '15px 0' }}>{success}</div>}
-        
-        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-          <Button type="submit">
-            {questionToEdit ? 'Update Question' : 'Post Question'}
-          </Button>
-          <Button variant="danger" onClick={() => navigate('/forum')}>
-            Cancel
-          </Button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <InputField
+            label="Question"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Enter your question"
+            error={error}
+          />
+          
+          {success && <div style={{ color: '#00ff00', margin: '15px 0' }}>{success}</div>}
+          
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <Button type="submit">
+              {questionToEdit ? 'Update Question' : 'Post Question'}
+            </Button>
+            <Button variant="danger" onClick={() => navigate('/forum')}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </AskContainer>
     </Container>
   );
 };

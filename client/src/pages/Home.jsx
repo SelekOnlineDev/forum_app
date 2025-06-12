@@ -9,7 +9,8 @@ const HomeContainer = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 100%;
+  background-image: url('/src/assets/matrix.png');
+  height: 70vh;
   padding: 20px;
 `;
 

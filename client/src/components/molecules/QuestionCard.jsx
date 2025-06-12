@@ -25,7 +25,7 @@ const Title = styled.h3`
 `;
 
 const Meta = styled.div`
-  color: #aaa;
+  color: #666666;
   font-size: 0.9rem;
   display: flex;
   justify-content: space-between;
@@ -33,7 +33,7 @@ const Meta = styled.div`
 `;
 
 const Badge = styled.span`
-  background-color: ${({ answered }) => answered ? '#00ff00' : '#ff0000'};
+  background-color: ${({ answered }) => answered ? '#00ff00' : '#666666'};
   color: #000;
   padding: 2px 8px;
   border-radius: 12px;

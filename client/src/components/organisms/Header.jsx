@@ -21,11 +21,25 @@ const HeaderContainer = styled.header`
   }
 `;
 
+const LeftSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
-  color: #00ff00;
-  
+
+  a {
+    color: #00ff00;
+    text-decoration: none;
+
+    &:hover {
+      color: #33ff33;
+    }
+  }
+
   @media (max-width: 768px) {
     margin-bottom: 10px;
   }
@@ -59,35 +73,34 @@ const Header = () => {
   
   return (
     <HeaderContainer>
-      <Logo>
-        <Link to="/">Quantum Forum</Link>
-      </Logo>
-      
-      <Button onClick={() => navigate('/ask')} size="medium">
-        Ask Question
-      </Button>
+      <LeftSection>
+        <Logo>
+          <Link to="/">Secret Quantum Forum</Link>
+        </Logo>
+        
+        <Button onClick={() => navigate('/ask')} size="medium">
+          Ask Question
+        </Button>
+      </LeftSection>
       
       <Navigation>
         {user ? (
           <>
             <UserGreeting>Welcome, {user.name}</UserGreeting>
-            <Button onClick={() => history.push('/ask')} size="medium">
-              Ask Question
-            </Button>
             <Button onClick={() => history.push('/user')} size="medium">
               Profile
             </Button>
             <Button onClick={logout} size="medium" variant="danger">
-              Logout
+              Log Out
             </Button>
           </>
         ) : (
           <>
-            <Link to="/login">
-              <Button size="medium">Login</Button>
-            </Link>
             <Link to="/register">
-              <Button size="medium">Sign Up</Button>
+                <Button size="medium">Sign Up</Button>
+            </Link>
+            <Link to="/login">
+              <Button size="medium">Log In</Button>
             </Link>
           </>
         )}

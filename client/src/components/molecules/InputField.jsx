@@ -14,9 +14,10 @@ const Label = styled.label`
 `;
 
 const ErrorText = styled.div`
-  color: #ff0000;
+  color: #666666;
   margin-top: 5px;
   font-size: 0.9rem;
+   border: 2px solid #00ff00;
 `;
 
 const InputField = ({ 

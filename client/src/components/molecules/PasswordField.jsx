@@ -34,13 +34,13 @@ const PasswordField = ({
   return (
     <PasswordWrapper>
       <Input
-        type={showPassword ? 'text' : 'password'}
+        type={showPassword ? 'text' : 'password'} 
         value={value}
         onChange={onChange}
         placeholder={placeholder}
       />
       <ToggleVisibility onClick={() => setShowPassword(!showPassword)}>
-        {showPassword ? '🙈' : '👁️'}
+        {showPassword ? '👁️' : '🙈'}
       </ToggleVisibility>
     </PasswordWrapper>
   );
