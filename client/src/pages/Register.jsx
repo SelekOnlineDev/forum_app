@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/atoms/Button';
 import PasswordField from '../components/molecules/PasswordField';
 import styled from 'styled-components';
@@ -58,6 +59,7 @@ const Success = styled.div`
 `;
 
 const Register = () => {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -197,10 +199,7 @@ const Register = () => {
       
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
         <span style={{ color: '#00ff00' }}>Already have an account? </span>
-        <Button 
-          variant="link" 
-          onClick={() => history.push('/login')}
-        >
+        <Button variant="link" onClick={() => navigate('/login')}>
           Log In
         </Button>
       </div>
