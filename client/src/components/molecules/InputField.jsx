@@ -17,7 +17,7 @@ const ErrorText = styled.div`
   color: #666666;
   margin-top: 5px;
   font-size: 0.9rem;
-   border: 2px solid #00ff00;
+  border: 2px solid #00ff00;
 `;
 
 const InputField = ({ 
@@ -37,7 +37,7 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        error={!!error}
+        $error={!!error}
         disabled={disabled}
       />
       {error && <ErrorText>{error}</ErrorText>}

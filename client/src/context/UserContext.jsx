@@ -1,195 +1,90 @@
-import { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import * as jwtDecode from 'jwt-decode';
 
-// Reducerio būsenos schema
-
-const initialState = {
-  user: null,
-  loading: true,
-  error: null
-};
-
-// Reducerio veiksmų tipai
-
-const actionTypes = {
+const initialState = { user: null, loading: true };
+const ACTIONS = {
   LOGIN: 'LOGIN',
   LOGOUT: 'LOGOUT',
-  UPDATE_USER: 'UPDATE_USER',
-  SET_LOADING: 'SET_LOADING',
-  SET_ERROR: 'SET_ERROR'
+  SET_LOADING: 'SET_LOADING'
 };
 
-// Reducerio funkcija
-
-function userReducer(state, action) {
+function reducer(state, action) {
   switch (action.type) {
-    case actionTypes.LOGIN:
-      return {
-        ...state,
-        user: action.payload,
-        loading: false,
-        error: null
-      };
-      
-    case actionTypes.LOGOUT:
-      return {
-        ...state,
-        user: null,
-        loading: false,
-        error: null
-      };
-      
-    case actionTypes.UPDATE_USER:
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          ...action.payload
-        }
-      };
-      
-    case actionTypes.SET_LOADING:
-      return {
-        ...state,
-        loading: action.payload
-      };
-      
-    case actionTypes.SET_ERROR:
-      return {
-        ...state,
-        error: action.payload,
-        loading: false
-      };
-      
+    case ACTIONS.LOGIN:
+      return { ...state, user: action.payload, loading: false };
+    case ACTIONS.LOGOUT:
+      return { ...state, user: null, loading: false };
+    case ACTIONS.SET_LOADING:
+      return { ...state, loading: action.payload };
     default:
       return state;
   }
-};
+}
 
 const UserContext = createContext();
 
-export const UserProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(userReducer, initialState);
-  const logoutTimerRef = useRef(null);
+export function UserProvider({ children }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const logoutTimer = useRef(null);
 
-  // Tikrinu ar vartotojas prisijungęs
+  const startTimer = () => {
+    if (logoutTimer.current) clearTimeout(logoutTimer.current);
+    logoutTimer.current = setTimeout(() => handleLogout(), 5 * 60 * 1000);
+  };
+
+  const handleLogin = (token, userData) => {
+    localStorage.setItem('quantum_token', token);
+    dispatch({ type: ACTIONS.LOGIN, payload: userData });
+    startTimer();
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('quantum_token');
+    dispatch({ type: ACTIONS.LOGOUT });
+    if (logoutTimer.current) clearTimeout(logoutTimer.current);
+  };
+
+  const resetLogoutTimer = () => startTimer();
 
   useEffect(() => {
-    const initializeUser = async () => {
-      try {
-        const token = localStorage.getItem('quantum_token');
-        
-        if (!token) {
-          dispatch({ type: actionTypes.SET_LOADING, payload: false });
-          return;
-        };
-        
-        
-        // Dekoduoju JWT 
-
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        );
-        
-        const decoded = JSON.parse(jsonPayload);
-        
-        // Tikrinu ar tokenas nepasibaigęs
-
-        if (decoded.exp * 1000 < Date.now()) {
-          logout();
-          return;
-        }
-        
-        // Nustatau vartotojo duomenis
-
-        dispatch({ 
-          type: actionTypes.LOGIN, 
-          payload: {
-            id: decoded.id,
-            name: decoded.name,
-            email: decoded.email
-          } 
+    const token = localStorage.getItem('quantum_token');
+    if (!token) {
+      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+      return;
+    }
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.exp * 1000 < Date.now()) {
+        handleLogout();
+      } else {
+        handleLogin(token, {
+          id: decoded.id,
+          name: decoded.name,
+          email: decoded.email
         });
-        
-        startLogoutTimer();
-      } catch (err) {
-        console.error('Token decoding error:', err);
-        dispatch({ 
-          type: actionTypes.SET_ERROR, 
-          payload: 'Failed to authenticate user' 
-        });
-        logout();
       }
-    };
-    
-    initializeUser();
+    } catch {
+      handleLogout();
+    }
   }, []);
 
-  const startLogoutTimer = () => {
-    if (logoutTimerRef.current) {
-      clearTimeout(logoutTimerRef.current);
-    }
-    
-    logoutTimerRef.current = setTimeout(() => {
-      logout();
-    }, 5 * 60 * 1000); // 5 min
-  };
-
-  const resetLogoutTimer = () => {
-    startLogoutTimer();
-  };
-
-  const login = (token, userData) => {
-    localStorage.setItem('quantum_token', token);
-    localStorage.setItem('quantum_user', JSON.stringify(userData));
-    
-    dispatch({ 
-      type: actionTypes.LOGIN, 
-      payload: userData 
-    });
-    
-    startLogoutTimer();
-  };
-
-  const logout = () => {
-    localStorage.removeItem('quantum_token');
-    localStorage.removeItem('quantum_user');
-    
-    if (logoutTimerRef.current) {
-      clearTimeout(logoutTimerRef.current);
-      logoutTimerRef.current = null;
-    }
-    
-    dispatch({ type: actionTypes.LOGOUT });
-  };
-
-  const updateUser = (updatedData) => {
-    const updatedUser = { ...state.user, ...updatedData };
-    localStorage.setItem('quantum_user', JSON.stringify(updatedUser));
-    
-    dispatch({ 
-      type: actionTypes.UPDATE_USER, 
-      payload: updatedData 
-    });
-  };
-
   return (
-    <UserContext.Provider value={{ 
-      user: state.user,
-      loading: state.loading,
-      error: state.error,
-      login, 
-      logout, 
-      updateUser,
-      resetLogoutTimer
-    }}>
+    <UserContext.Provider
+      value={{
+        user: state.user,
+        loading: state.loading,
+        login: handleLogin,
+        logout: handleLogout,
+        resetLogoutTimer
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
-};
+}
 
-export const useUser = () => useContext(UserContext);
+export function useUser() {
+  const ctx = useContext(UserContext);
+  if (!ctx) throw new Error('useUser used outside UsersProvider');
+  return ctx;
+}

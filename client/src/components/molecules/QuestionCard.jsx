@@ -32,7 +32,7 @@ const Meta = styled.div`
 `;
 
 const Badge = styled.span`
-  background-color: ${({ answered }) => answered ? '#00ff00' : '#666666'};
+  background-color: ${({ $answered }) => $answered ? '#00ff00' : '#666666'};
   color: #000;
   padding: 2px 8px;
   border-radius: 12px;
@@ -48,46 +48,38 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const QuestionCard = ({ question, onDelete, isOwner, answers, answerCount, userName, createdAt }) => {
-  const isAnswered = question.answerCount > 0;
-  
+const QuestionCard = ({ question, onDelete, isOwner }) => {
+  const isAnswered = question.answers?.length > 0;
+
   return (
     <Card>
-      <Title>{question}</Title>
-      <Title>{answers}</Title>
-      <Title>{answerCount}</Title>
-      <Title>{userName}</Title>
-      <Title>{new Date(createdAt).toLocaleDateString()}</Title>
+      <Title>{question.title}</Title>
 
-      {question.answers?.slice(0, 3).map(answer => (
-        <div key={answer._id} style={{ marginTop: '10px', color: '#00cc66' }}>
+      {question.answers?.slice(0, 3).map((answer) => (
+        <div key={answer._id} style={{ marginTop: '10px', color: '#00ff00' }}>
           <strong>A:</strong> {answer.answer}
         </div>
       ))}
-      
+
       {question.answers?.length > 3 && (
-        <div style={{ color: '#00cc66', marginTop: '5px' }}>
+        <div style={{ color: '#00ff00', marginTop: '5px' }}>
           +{question.answers.length - 3} more answers
         </div>
       )}
-      
+
       <Meta>
-        <div>Autorius: {userName} • {new Date(createdAt).toLocaleDateString()}</div>
-        <Badge $answered={answerCount > 0}>
-          {answerCount > 0 ? `${answerCount} atsakymai` : 'Nėra atsakymų'}
-        </Badge>
         <div>
-          <span>By: {question.userName}</span> • 
-          <span> {new Date(question.createdAt).toLocaleDateString()}</span>
+          Autorius: {question.userName} •{' '}
+          {new Date(question.createdAt).toLocaleDateString()}
         </div>
-        <Badge answered={isAnswered}>
-          {isAnswered ? `${question.answerCount} answers` : 'No answers'}
+        <Badge $answered={isAnswered}>
+          {isAnswered ? `${question.answers.length} Answers` : 'No answer'}
         </Badge>
       </Meta>
-      
+
       {isOwner && (
-        <DeleteButton 
-          variant="danger" 
+        <DeleteButton
+          variant="danger"
           size="small"
           onClick={(e) => {
             e.stopPropagation();

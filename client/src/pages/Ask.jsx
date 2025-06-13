@@ -96,7 +96,7 @@ const Ask = () => {
             <Button type="submit">
               {questionToEdit ? 'Update Question' : 'Post Question'}
             </Button>
-            <Button variant="danger" onClick={() => navigate('/forum')}>
+            <Button variant="danger" onClick={() => navigate('/home')}>
               Cancel
             </Button>
           </div>

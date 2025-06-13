@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const Button = styled.button`
   background-color: ${({ $variant }) => 
-    $variant === 'danger' ? '#666666' : '#33FF33'};
+    $variant === 'danger' ? '#666666' : '#00FF00'};
   color: #000;
   border: 2px solid #000;
   border-radius: 4px;
@@ -16,8 +16,8 @@ const Button = styled.button`
 
   &:hover {
     background-color: #000;
-    color: #33FF33;
-    border-color: #33FF33;
+    color: #00FF00;
+    border-color: #00FF00;
   }
 `;
 

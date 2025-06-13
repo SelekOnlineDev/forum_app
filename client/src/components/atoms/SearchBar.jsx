@@ -11,7 +11,7 @@ const SearchContainer = styled.div`
 const StyledInput = styled.input`
   flex: 1;
   padding: 10px 15px;
-  background-color: #111;
+  background-color: #000;
   border: 1px solid #00ff00;
   color: #00ff00;
   font-family: 'Courier New', Courier, monospace;
