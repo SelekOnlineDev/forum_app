@@ -81,9 +81,7 @@ export const getQuestionById = async (req, res) => {
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     } 
-    if (question.userId !== req.user.id) {
-      return res.status(403).json({ message: 'Unautorized' });
-    }
+  
     res.status(200).json(question);
     const answers = await db.collection('answers')
       .find({ questionId: req.params.id })

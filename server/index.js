@@ -2,7 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
-
+import { 
+  getAllQuestions,
+  createQuestion,
+  getQuestionById,
+  deleteQuestion,
+  updateQuestion
+} from './controllers/questionController.js';
 import userRoutes from './routes/userRoutes.js';
 import questionRoutes from './routes/questionRoutes.js';
 import answerRoutes from './routes/answerRoutes.js';
@@ -55,7 +61,6 @@ const startServer = async () => {
     app.use('/api', userRoutes);
     app.use('/api', questionRoutes);
     app.use('/api', answerRoutes);
-    app.get('/api/questions/:id', getQuestionById);
 
     // Testinis maršrutas, kad patikrinti ar serveris veikia
 
