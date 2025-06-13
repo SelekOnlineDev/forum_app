@@ -17,22 +17,31 @@ const QuestionDetail = () => {
   const [question, setQuestion] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [newAnswer, setNewAnswer] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const { user } = useUser();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const [questionRes, answersRes] = await Promise.all([
-        api.get(`/questions/${id}`),
-        api.get(`/questions/${id}/answers`)
-      ]);
-      
-      setQuestion(questionRes.data);
-      setAnswers(answersRes.data);
-    };
+  useEffect(() => { 
     
-    fetchData();
-  }, [id]);
+  const fetchData = async () => {
+    try {
+      const response = await api.get(`/questions/${id}`);
+      setQuestion(response.data);
+      setAnswers(response.data.answers || []);
+      setLoading(true);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to load question');
+      console.error('Failed to fetch question:', error);
+    }
+  };
+  
+  fetchData();
+}, [id]);
+
+  if (loading) return <div style={{ color: '#00ff00' }}>Loading...</div>;
+  if (error) return <div style={{ color: '#00ff00' }}>{error}</div>;
 
   const handleSubmit = async () => {
     if (!user) {

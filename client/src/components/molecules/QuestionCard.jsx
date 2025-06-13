@@ -56,6 +56,18 @@ const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
   return (
     <Card onClick={onClick}>
       <Title>{question.question}</Title>
+
+      {question.answers?.slice(0, 3).map(answer => (
+        <div key={answer._id} style={{ marginTop: '10px', color: '#00cc66' }}>
+          <strong>A:</strong> {answer.answer}
+        </div>
+      ))}
+      
+      {question.answers?.length > 3 && (
+        <div style={{ color: '#00cc66', marginTop: '5px' }}>
+          +{question.answers.length - 2} more answers
+        </div>
+      )}
       
       <Meta>
         <div>

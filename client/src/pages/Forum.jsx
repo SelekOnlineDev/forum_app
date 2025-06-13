@@ -74,15 +74,10 @@ const Forum = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await api.get(
-        `/questions?search=${searchTerm}&filter=${filter}&sort=${sort}&page=${pagination.page}&limit=${pagination.limit}`
-    );
+        const response = await api.get(`/questions`);
+        console.log('Questions response:', response.data);
     
     setQuestions(response.data.questions);
-    setPagination(prev => ({
-      ...prev,
-      total: response.data.total
-    }));
   } catch (error) {
     console.error('Error fetching questions:', error);
   }
@@ -119,6 +114,18 @@ const Forum = () => {
     } catch (error) {
       console.error('Delete failed:', error);
     }
+
+            {questions.length === 0 && !loading && (
+              <div style={{ color: '#00ff00', textAlign: 'center' }}>
+                No questions found
+              </div>
+            )}
+
+            {loading && (
+              <div style={{ color: '#00ff00', textAlign: 'center' }}>
+                Loading questions...
+              </div>
+            )}
   };
 
   return (

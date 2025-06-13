@@ -21,6 +21,21 @@ export const registerUser = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
+     const token = jwt.sign(
+      { id: newUser._id, name: newUser.name, email: newUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({ 
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email
+      }
+    });
+
     await users.insertOne(newUser);
     res.status(201).json({ message: 'User registered', id: newUser._id });
   } catch (err) {
@@ -67,9 +82,7 @@ export const updateProfile = async (req, res) => {
     // Patikrinu ar email jau naudojamas ar ne
 
     const existing = await users.findOne({ email, _id: { $ne: userId } });
-    if (existing) {
-      return res.status(400).json({ message: 'Email already in use' });
-    }
+    if (existing) return res.status(400).json({ message: 'Email already in use' });
 
     const result = await users.updateOne(
       { _id: userId },
@@ -79,6 +92,15 @@ export const updateProfile = async (req, res) => {
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    const updatedUser = await users.findOne({ _id: userId });
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        name: updatedUser.name,
+        email: updatedUser.email
+      }
+    });
 
     res.status(200).json({ message: 'Profile updated', user: { name, email } });
   } catch (err) {
@@ -97,16 +119,12 @@ export const updatePassword = async (req, res) => {
     // Randu vartotoją
 
     const user = await users.findOne({ _id: userId });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     // Tikrinu slaptažodį
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid current password' });
-    }
+    if (!isMatch) return res.status(401).json({ message: 'Invalid current password' });
 
     // Šifruoju naują slaptažodį
 

@@ -35,8 +35,15 @@ export const getAllQuestions = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .toArray();
+
+    const total = await db.collection('questions').countDocuments();
       
     res.status(200).json(questions);
+     pagination: {
+      page,
+      limit,
+      total
+    }
   } catch (err) {
     console.error('Error getting questions:', err);
     res.status(500).json({ message: 'Server error' });
@@ -74,6 +81,14 @@ export const getQuestionById = async (req, res) => {
       return res.status(403).json({ message: 'Unautorized' });
     }
     res.status(200).json(question);
+    const answers = await db.collection('answers')
+      .find({ questionId: req.params.id })
+      .toArray();
+    
+    res.status(200).json({
+      ...question,
+      answers
+    });
   } catch (err) {
     console.error('Error getting question by ID:', err);
     res.status(500).json({ message: 'Server error' });
