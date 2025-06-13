@@ -95,6 +95,8 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const response = await api.patch('/user/profile', { name, email });
+
     const updatedUser = await users.findOne({ _id: userId });
     res.status(200).json({
       message: 'Profile updated successfully',
