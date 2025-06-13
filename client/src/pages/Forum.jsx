@@ -63,6 +63,7 @@ const Forum = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
+  const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const [pagination, setPagination] = useState({
@@ -73,13 +74,16 @@ const Forum = () => {
 
   useEffect(() => {
     const fetchQuestions = async () => {
+      setLoading(true);
       try {
-        const response = await api.get(`/questions`);
+        const response = await api.get(`/questions?search=${searchTerm}&filter=${filter}&sort=${sort}`);
         console.log('Questions response:', response.data);
     
-    setQuestions(response.data.questions);
+    setQuestions(response.data);
   } catch (error) {
     console.error('Error fetching questions:', error);
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -114,18 +118,6 @@ const Forum = () => {
     } catch (error) {
       console.error('Delete failed:', error);
     }
-
-            {questions.length === 0 && !loading && (
-              <div style={{ color: '#00ff00', textAlign: 'center' }}>
-                No questions found
-              </div>
-            )}
-
-            {loading && (
-              <div style={{ color: '#00ff00', textAlign: 'center' }}>
-                Loading questions...
-              </div>
-            )}
   };
 
   return (
@@ -177,7 +169,31 @@ const Forum = () => {
           Most Answers
         </FilterButton>
       </Filters>
-      
+
+       {questions.length === 0 && !loading && (
+          <div style={{ color: '#00ff00', textAlign: 'center' }}>
+                No questions found
+          </div>
+            )}
+       {loading && (
+           <div style={{ color: '#00ff00', textAlign: 'center' }}>
+                Loading questions...
+           </div>
+            )}
+       {loading ? (
+           <div style={{ color: '#00ff00', textAlign: 'center' }}>
+                Loading questions...
+           </div>
+          ) : questions.length === 0 ? (
+           <div style={{ color: '#00ff00', textAlign: 'center' }}>
+          No questions found
+           </div>
+          ) : (
+              questions.map(question => (
+    <   QuestionCard key={question._id} {...question} />
+        ))
+      )}
+
       <QuestionsList>
         {questions.map(question => (
           <QuestionCard

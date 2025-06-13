@@ -25,15 +25,16 @@ const QuestionDetail = () => {
   useEffect(() => { 
     
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await api.get(`/questions/${id}`);
       setQuestion(response.data);
       setAnswers(response.data.answers || []);
-      setLoading(true);
-      setLoading(false);
     } catch (error) {
       setError('Failed to load question');
       console.error('Failed to fetch question:', error);
+      } finally {
+      setLoading(false);
     }
   };
   

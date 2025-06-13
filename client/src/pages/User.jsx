@@ -116,6 +116,7 @@ const User = () => {
       
       if (response.status === 200) {
         updateUser({ name, email });
+        updateUser(response.data.user);
         setSuccess('Profile updated successfully');
         setErrors({});
         setIsEditing(false);
@@ -162,7 +163,6 @@ const User = () => {
         setPassword('');
         setNewPassword('');
         setConfirmPassword('');
-        setErrors({});
         
         // Išvalau pranešimą po 5 sekundžių
 
