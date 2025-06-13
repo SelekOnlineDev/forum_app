@@ -16,9 +16,10 @@ export const getAllQuestions = async (req, res) => {
     }
     
     if (filter === 'answered') {
-      query.answerCount = { $gt: 0 };
-    } else if (filter === 'unanswered') {
-      query.answerCount = { $eq: 0 };
+      query.answerCount = { $gt: 0 };  // Tik atsakyti klausimai
+    }   
+    else if (filter === 'unanswered') {
+      query.answerCount = { $eq: 0 };  // Tik neatsakyti klausimai
     }
     
     let sortOption = { createdAt: -1 };
@@ -65,9 +66,9 @@ export const getQuestionById = async (req, res) => {
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     } 
-    // if (question.userId !== req.user.id) {
-    //   return res.status(403).json({ message: 'Unautorized' });
-    // }
+    if (question.userId !== req.user.id) {
+      return res.status(403).json({ message: 'Unautorized' });
+    }
     res.status(200).json(question);
   } catch (err) {
     console.error('Error getting question by ID:', err);
