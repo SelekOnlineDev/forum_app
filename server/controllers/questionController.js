@@ -38,12 +38,16 @@ export const getAllQuestions = async (req, res) => {
 
     const total = await db.collection('questions').countDocuments();
       
-    res.status(200).json(questions);
-     pagination: {
-      page,
-      limit,
-      total
+    // Gaunu atsakymus kiekvienam klausimui
+
+    for (const question of questions) {
+      const answers = await db.collection('answers')
+        .find({ questionId: question._id })
+        .toArray();
+      question.answers = answers;
     }
+
+    res.status(200).json(questions);
   } catch (err) {
     console.error('Error getting questions:', err);
     res.status(500).json({ message: 'Server error' });
@@ -85,10 +89,7 @@ export const getQuestionById = async (req, res) => {
       .find({ questionId: req.params.id })
       .toArray();
     
-    res.status(200).json({
-      ...question,
-      answers
-    });
+    res.status(200).json({ ...question, answers });
   } catch (err) {
     console.error('Error getting question by ID:', err);
     res.status(500).json({ message: 'Server error' });
