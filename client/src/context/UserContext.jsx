@@ -81,7 +81,8 @@ export const UserProvider = ({ children }) => {
         if (!token) {
           dispatch({ type: actionTypes.SET_LOADING, payload: false });
           return;
-        }
+        };
+        
         
         // Dekoduoju JWT 
 

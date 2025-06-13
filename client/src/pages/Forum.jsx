@@ -63,7 +63,7 @@ const Forum = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
   const [pagination, setPagination] = useState({
@@ -74,7 +74,6 @@ const Forum = () => {
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      setLoading(true);
       try {
         const response = await api.get(`/questions?search=${searchTerm}&filter=${filter}&sort=${sort}`);
         console.log('Questions response:', response.data);
@@ -82,9 +81,7 @@ const Forum = () => {
     setQuestions(response.data);
   } catch (error) {
     console.error('Error fetching questions:', error);
-  } finally {
-    setLoading(false);
-  }
+  } 
 };
 
     fetchQuestions();

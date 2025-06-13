@@ -48,13 +48,16 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const QuestionCard = ({ question, onDelete, isOwner, answers }) => {
+const QuestionCard = ({ question, onDelete, isOwner, answers, answerCount, userName, createdAt }) => {
   const isAnswered = question.answerCount > 0;
   
   return (
     <Card>
       <Title>{question}</Title>
       <Title>{answers}</Title>
+      <Title>{answerCount}</Title>
+      <Title>{userName}</Title>
+      <Title>{new Date(createdAt).toLocaleDateString()}</Title>
 
       {question.answers?.slice(0, 3).map(answer => (
         <div key={answer._id} style={{ marginTop: '10px', color: '#00cc66' }}>
@@ -69,6 +72,10 @@ const QuestionCard = ({ question, onDelete, isOwner, answers }) => {
       )}
       
       <Meta>
+        <div>Autorius: {userName} • {new Date(createdAt).toLocaleDateString()}</div>
+        <Badge $answered={answerCount > 0}>
+          {answerCount > 0 ? `${answerCount} atsakymai` : 'Nėra atsakymų'}
+        </Badge>
         <div>
           <span>By: {question.userName}</span> • 
           <span> {new Date(question.createdAt).toLocaleDateString()}</span>
