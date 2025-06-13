@@ -59,6 +59,7 @@ const QuestionsList = styled.div`
 const Forum = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
   const [questions, setQuestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
@@ -170,6 +171,8 @@ const Forum = () => {
             onClick={() => navigate(`/question/${question._id}`)}
           />
         ))}
+        <button onClick={() => setCurrentPage(p => Math.max(p-1, 1))}>Previous</button>
+        <button onClick={() => setCurrentPage(p => p+1)}>Next</button>
       </QuestionsList>
       
       <Modal

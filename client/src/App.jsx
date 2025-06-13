@@ -59,6 +59,7 @@ function App() {
                 <Route path="/forum" element={<Forum />} />
                 <Route path="/ask" element={<Ask />} />
                 <Route path="/user" element={<User />} />
+                <Route path="/question/:id" element={<QuestionDetail />} />
               </Route>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

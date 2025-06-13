@@ -48,8 +48,9 @@ export const loginUser = async (req, res) => {
     console.log('Password match:', match); // Ar slaptažodis teisingas?
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, name: user.name } });
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, 
+    process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
