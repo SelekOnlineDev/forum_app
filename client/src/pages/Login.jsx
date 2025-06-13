@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import InputField from '../components/molecules/InputField';
 import PasswordField from '../components/molecules/PasswordField';
@@ -52,6 +53,7 @@ const SignupPrompt = styled.div`
 `;
 
 const Login = () => {
+  const navigate = useNavigate();
   const { login } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -130,12 +132,9 @@ const Login = () => {
       
       <SignupPrompt>
         Don't have an account?{' '}
-        <Button 
-          variant="link" 
-          onClick={() => history.push('/register')}
-        >
-          Sign Up
-        </Button>
+          <Button variant="link" onClick={() => navigate('/register')}>
+              Sign Up
+          </Button>
       </SignupPrompt>
     </LoginContainer>
   );
