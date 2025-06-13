@@ -55,7 +55,7 @@ export const loginUser = async (req, res) => {
 
     const user = await users.findOne({ email: email });
     console.log('User found:', user); // Ar vartotojas rastas?
-    if (!user) {
+    if (user) {
      console.log(`User not found: ${email}`);
      return res.status(404).json({ message: 'User not found' });
     }
@@ -65,7 +65,8 @@ export const loginUser = async (req, res) => {
     console.log('Password match:', match); // Ar slaptažodis teisingas?
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, 
+    
+    const token = jwt.sign ({ id: user._id, name: user.name, email: user.email }, 
     process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
