@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { getDb } from '../index.js';
 
 export const getAllQuestions = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 3;  // 3 klausimai per puslapį
+    const skip = (page - 1) * limit;
   try {
     const db = await getDb();
     const { search, filter, sort } = req.query;
@@ -29,7 +32,8 @@ export const getAllQuestions = async (req, res) => {
     
     const questions = await db.collection('questions')
       .find(query)
-      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
       .toArray();
       
     res.status(200).json(questions);
