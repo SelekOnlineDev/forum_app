@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useUser } from '../../context/UserContext';
 import Button from '../atoms/Button';
 
 const Card = styled.div`
@@ -50,12 +49,11 @@ const DeleteButton = styled(Button)`
 `;
 
 const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
-  const { user } = useUser();
   const isAnswered = question.answerCount > 0;
   
   return (
     <Card onClick={onClick}>
-      <Title>{question.question}</Title>
+      <Title>{question}</Title>
 
       {question.answers?.slice(0, 3).map(answer => (
         <div key={answer._id} style={{ marginTop: '10px', color: '#00cc66' }}>
@@ -65,7 +63,7 @@ const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
       
       {question.answers?.length > 3 && (
         <div style={{ color: '#00cc66', marginTop: '5px' }}>
-          +{question.answers.length - 2} more answers
+          +{question.answers.length - 3} more answers
         </div>
       )}
       

@@ -190,7 +190,11 @@ const Forum = () => {
            </div>
           ) : (
               questions.map(question => (
-    <   QuestionCard key={question._id} {...question} />
+         <QuestionCard 
+            key={question._id} 
+            question={question.question}
+            answers={question.answers}
+            {...question}/>
         ))
       )}
 
