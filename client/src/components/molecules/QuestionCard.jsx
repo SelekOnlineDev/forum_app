@@ -48,12 +48,13 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const QuestionCard = ({ question, onClick, onDelete, isOwner }) => {
+const QuestionCard = ({ question, onDelete, isOwner, answers }) => {
   const isAnswered = question.answerCount > 0;
   
   return (
-    <Card onClick={onClick}>
+    <Card>
       <Title>{question}</Title>
+      <Title>{answers}</Title>
 
       {question.answers?.slice(0, 3).map(answer => (
         <div key={answer._id} style={{ marginTop: '10px', color: '#00cc66' }}>

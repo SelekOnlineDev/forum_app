@@ -29,7 +29,7 @@ const Header = styled.div`
   gap: 15px;
 `;
 
-const H2 = styled.h2`
+const Title = styled.h2`
   border: 2px solid #00ff00;
   border-radius: 4px;
   flex-wrap: wrap;
@@ -124,9 +124,9 @@ const Forum = () => {
     <PageContainer >
     <ForumContainer>
       <Header>
-        <H2>
+        <Title>
           <h2>Quantum Physics Forum</h2>
-        </H2>
+        </Title>
         <Button size="large" onClick={handleAskQuestion}>
           Ask Question
         </Button>
@@ -199,14 +199,15 @@ const Forum = () => {
       )}
 
       <QuestionsList>
-        {questions.map(question => (
+        {questions.map(q => (
           <QuestionCard
-            key={question._id}
-            question={question}
-            onDelete={() => handleDeleteClick(question._id)}
-            onEdit={() => handleEditQuestion(question._id)}
-            isOwner={user && user.id === question.userId}
-            onClick={() => navigate(`/question/${question._id}`)}
+            key={q._id}
+            question={q.question}
+            answers={q.answers}
+            onDelete={() => handleDeleteClick(q._id)}
+            onEdit={() => handleEditQuestion(q._id)}
+            isOwner={user && user.id === q.userId}
+            onClick={() => navigate(`/question/${q._id}`)}
           />
         ))}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
