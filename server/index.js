@@ -55,6 +55,7 @@ const startServer = async () => {
     app.use('/api', userRoutes);
     app.use('/api', questionRoutes);
     app.use('/api', answerRoutes);
+    app.get('/api/questions/:id', getQuestionById);
 
     // Testinis maršrutas, kad patikrinti ar serveris veikia
 
