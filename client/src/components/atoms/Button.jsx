@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 const Button = styled.button`
-  background-color: ${({ variant }) => 
-    variant === 'danger' ? '#666666' : '#33FF33'};
+  background-color: ${({ $variant }) => 
+    $variant === 'danger' ? '#666666' : '#33FF33'};
   color: #000;
   border: 2px solid #000;
   border-radius: 4px;
