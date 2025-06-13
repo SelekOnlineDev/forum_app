@@ -1,7 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import Button from '../components/atoms/Button';
 import styled from 'styled-components';
+
+
 
 const HomeContainer = styled.div`
   display: flex;
@@ -56,6 +59,17 @@ const ActionButton = styled(Button)`
 `;
 
 const Home = () => {
+  const { user } = useUser();
+  const navigate = useNavigate();
+
+  const handleGoToForum = () => {
+    if (user) {
+      navigate('/forum');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <HomeContainer>
       <TitleBox>
@@ -63,9 +77,9 @@ const Home = () => {
         <Subtitle>Explore the mysteries of quantum physics</Subtitle>
       </TitleBox>
       
-      <Link to="/forum">
-        <ActionButton size="large">Go to Forum</ActionButton>
-      </Link>
+      <ActionButton size="large" onClick={handleGoToForum}>
+        Go to Forum
+      </ActionButton>
     </HomeContainer>
   );
 };

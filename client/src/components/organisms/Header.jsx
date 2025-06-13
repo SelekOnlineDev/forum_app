@@ -75,7 +75,7 @@ const Header = () => {
     <HeaderContainer>
       <LeftSection>
         <Logo>
-          <Link to="/">Secret Quantum Forum</Link>
+          <Link to="/">Secret Quantum</Link>
         </Logo>
         
         <Button onClick={() => navigate('/ask')} size="medium">
