@@ -122,7 +122,7 @@ const Forum = () => {
     <ForumContainer>
       <Header>
         <Title>
-          <h2>Quantum Physics Forum</h2>
+          Quantum Physics Forum
         </Title>
         <Button size="large" onClick={handleAskQuestion}>
           Ask Question

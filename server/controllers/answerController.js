@@ -28,6 +28,10 @@ export const createAnswer = async (req, res) => {
     };
 
     await db.collection('answers').insertOne(newAnswer);
+    await db.collection('questions').updateOne(
+      { _id: id },
+      { $inc: { answerCount: 1 } }
+    );
     res.status(201).json({ message: 'Answer created' });
   } catch (err) {
     console.error('Error creating answer:', err);
@@ -94,6 +98,10 @@ export const deleteAnswer = async (req, res) => {
     }
 
     const result = await db.collection('answers').deleteOne({ _id: id }); //Ištrinu atsakymą
+    await db.collection('questions').updateOne(
+         { _id: answer.questionId },
+         { $inc: { answerCount: -1 } }
+    );
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'Answer not found' });

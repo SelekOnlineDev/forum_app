@@ -112,7 +112,7 @@ const User = () => {
     }
     
     try {
-      const response = await api.patch('/api/user/profile', { name, email });
+      const response = await api.patch('/user/profile', { name, email });
       
       if (response.status === 200) {
         updateUser({ name, email });

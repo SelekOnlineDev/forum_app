@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.patch('/user/profile', authMiddleware, updateProfile);
-router.patch('/user/password', authMiddleware, updatePassword);
+router.patch('/profile', authMiddleware, updateProfile);
+router.patch('/password', authMiddleware, updatePassword);
 
 export default router;

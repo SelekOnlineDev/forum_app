@@ -124,7 +124,7 @@ export const updatePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    const response = await api.patch('/user/password', {
+    const response = await api.patch( {
       currentPassword: password,
       newPassword
     });
