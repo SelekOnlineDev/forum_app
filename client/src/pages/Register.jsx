@@ -107,18 +107,14 @@ const Register = () => {
     }
     
     try {
-      const response = await api.post('/register', {
-        name,
-        email,
-        password
-      });
-      
-      if (response.status === 201) {
-        setSuccess('Registration successful! Redirecting to login...');
-        setErrors({});
-        setTimeout(() => history.push('/login'), 3000);
-      }
-    } catch (err) {
+    const response = await api.post('/register', { name, email, password });
+    
+    if (response.data.token) {
+      login(response.data.token, response.data.user);  // Automatinis prisijungimas
+      setSuccess('Registration successful!');
+      setTimeout(() => navigate('/'), 2000);
+    }
+      } catch (err) {
       if (err.response?.data?.message === 'User already exists') {
         setErrors({ email: 'Email already registered' });
       } else {

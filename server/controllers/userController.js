@@ -79,7 +79,7 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json({ message: 'Profile updated' });
+    res.status(200).json({ message: 'Profile updated', user: { name, email } });
   } catch (err) {
     console.error('Profile update error:', err);
     res.status(500).json({ message: 'Server error' });

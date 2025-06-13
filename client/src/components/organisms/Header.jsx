@@ -70,6 +70,11 @@ const UserGreeting = styled.span`
 const Header = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
+
+const handleLogout = () => {
+  logout();
+  navigate('/'); 
+};
   
   return (
     <HeaderContainer>
@@ -87,12 +92,12 @@ const Header = () => {
         {user ? (
           <>
             <UserGreeting>Welcome, {user.name}</UserGreeting>
-            <Button onClick={() => history.push('/user')} size="medium">
-              Profile
-            </Button>
-            <Button onClick={logout} size="medium" variant="danger">
-              Log Out
-            </Button>
+              <Button onClick={() => navigate('/user')} size="medium">
+                Profile
+              </Button>
+              <Button onClick={handleLogout} size="medium" variant="danger">
+                Log Out
+              </Button>
           </>
         ) : (
           <>

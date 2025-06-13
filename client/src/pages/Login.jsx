@@ -67,17 +67,14 @@ const Login = () => {
     setLoading(true);
     setError('');
     
-    try {
-      const response = await api.post('/login', {
-        email,
-        password
-      });
-      
-      if (response.data.token) {
-        login(response.data.token, response.data.user);
-        setSuccess('Login successful! Redirecting...');
-        setTimeout(() => history.push('/forum'), 1500);
-      }
+   try {
+    const response = await api.post('/login', { email, password });
+    
+    if (response.data.token) {
+      login(response.data.token, response.data.user);
+      setSuccess('Login successful! Redirecting...');
+      setTimeout(() => navigate('/'), 1500);  // Navigacija į Home
+    }
     } catch (err) {
       if (err.response?.status === 401) {
         setError('Invalid email or password');
