@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import Button from '../components/atoms/Button';
 import PasswordField from '../components/molecules/PasswordField';
 import styled from 'styled-components';
@@ -59,6 +60,7 @@ const Success = styled.div`
 `;
 
 const Register = () => {
+  const { login } = useUser();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

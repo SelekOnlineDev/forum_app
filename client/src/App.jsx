@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Forum from './pages/Forum';
 import Ask from './pages/Ask';
 import User from './pages/User';
+import QuestionDetail from './pages/QuestionDetail'; 
 import styled from 'styled-components';
 
 const AppContainer = styled.div`
@@ -20,10 +21,7 @@ const AppContainer = styled.div`
   font-family: 'Courier New', Courier, monospace;
 `;
 
-  const AutoLogoutHandler = ({ children }) => {
-
-  // Automatinio atsijungimo valdymas
-
+const AutoLogoutHandler = ({ children }) => {
   const { resetLogoutTimer } = useUser();
 
   useEffect(() => {
@@ -44,8 +42,8 @@ const AppContainer = styled.div`
     };
   }, [resetLogoutTimer]);
 
-    return children;
-  };
+  return children;
+};
 
 function App() {
   return (

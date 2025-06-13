@@ -59,23 +59,34 @@ const QuestionsList = styled.div`
 const Forum = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
   const [questions, setQuestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 3,
+    total: 0
+  });
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await api.get(`/questions?search=${searchTerm}&filter=${filter}&sort=${sort}`);
-        setQuestions(response.data);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
-    };
+        const response = await api.get(
+        `/questions?search=${searchTerm}&filter=${filter}&sort=${sort}&page=${pagination.page}&limit=${pagination.limit}`
+    );
+    
+    setQuestions(response.data.questions);
+    setPagination(prev => ({
+      ...prev,
+      total: response.data.total
+    }));
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+  }
+};
 
     fetchQuestions();
   }, [searchTerm, filter, sort]);
@@ -171,8 +182,25 @@ const Forum = () => {
             onClick={() => navigate(`/question/${question._id}`)}
           />
         ))}
-        <button onClick={() => setCurrentPage(p => Math.max(p-1, 1))}>Previous</button>
-        <button onClick={() => setCurrentPage(p => p+1)}>Next</button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+          <button 
+            disabled={pagination.page === 1}
+            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+          >
+            Previous
+          </button>
+          
+          <span style={{ margin: '0 10px' }}>
+            Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit)}
+          </span>
+          
+          <button 
+            disabled={pagination.page * pagination.limit >= pagination.total}
+            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+          >
+            Next
+          </button>
+        </div>
       </QuestionsList>
       
       <Modal
