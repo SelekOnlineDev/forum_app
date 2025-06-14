@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
-import * as jwtDecode from 'jwt-decode';
+import jwt_decode from 'jwt-decode';
 
 const initialState = { user: null, loading: true };
 const ACTIONS = {
@@ -48,22 +48,30 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem('quantum_token');
+    
     if (!token) {
       dispatch({ type: ACTIONS.SET_LOADING, payload: false });
       return;
     }
+    
     try {
-      const decoded = jwtDecode(token);
+      const decoded = jwt_decode(token);
+      
       if (decoded.exp * 1000 < Date.now()) {
         handleLogout();
       } else {
-        handleLogin(token, {
-          id: decoded.id,
-          name: decoded.name,
-          email: decoded.email
+        dispatch({ 
+          type: ACTIONS.LOGIN, 
+          payload: {
+            id: decoded.id,
+            name: decoded.name,
+            email: decoded.email
+          }
         });
+        startTimer();
       }
-    } catch {
+    } catch (err) {
+      console.error('Token decode error:', err);
       handleLogout();
     }
   }, []);
@@ -85,6 +93,6 @@ export function UserProvider({ children }) {
 
 export function useUser() {
   const ctx = useContext(UserContext);
-  if (!ctx) throw new Error('useUser used outside UsersProvider');
+  if (!ctx) throw new Error('useUser used outside UserProvider');
   return ctx;
 }

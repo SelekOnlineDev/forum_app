@@ -61,8 +61,13 @@ export const updateAnswer = async (req, res) => {
 
     const result = await db.collection('answers').updateOne(
       { _id: id },
-      { $set: { answer: content } }
-    );
+      { 
+      $set: { 
+        answer: content,
+        updatedAt: new Date().toISOString() 
+      } 
+    }
+  );
 
     // Patikrinu ar atsakymas buvo atnaujintas
 

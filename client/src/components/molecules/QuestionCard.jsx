@@ -23,6 +23,13 @@ const Title = styled.h3`
   margin-right: 40px;
 `;
 
+const LikeButton = styled.button`
+  background-color: #000;
+  color: #00FF00;
+  border: 1px solid #00FF00;
+  border-radius: 4px;
+`;
+
 const Meta = styled.div`
   color: #666666;
   font-size: 0.9rem;
@@ -48,15 +55,29 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const QuestionCard = ({ question, onDelete, isOwner }) => {
-  const isAnswered = question.answers?.length > 0;
+const QuestionCard = ({ question, onDelete, isOwner, onLike, onDislike }) => {
+  const isAnswered = question.answers?.length > 0 || false;
+  // const likes = question.likes || 0;
 
   return (
     <Card>
       <Title>{question.title}</Title>
 
+      <LikeButton onClick={() => onLike(question._id)}>
+        👍 {question.likes || 0}
+      </LikeButton>
+      <LikeButton onClick={() => onDislike(question._id)}>
+        👎 {question.dislikes || 0}
+      </LikeButton>
+
+      {question.updatedAt && (
+        <span style={{ color: '#666', fontSize: '0.8rem' }}>
+          (edited)
+        </span>
+      )}
+
       {question.answers?.slice(0, 3).map((answer) => (
-        <div key={answer._id} style={{ marginTop: '10px', color: '#00ff00' }}>
+        <div key={answer._id || Math.random()} style={{ marginTop: '10px', color: '#00ff00' }}>
           <strong>A:</strong> {answer.answer}
         </div>
       ))}
@@ -69,7 +90,7 @@ const QuestionCard = ({ question, onDelete, isOwner }) => {
 
       <Meta>
         <div>
-          Autorius: {question.userName} •{' '}
+          Author: {question.userName} •{' '}
           {new Date(question.createdAt).toLocaleDateString()}
         </div>
         <Badge $answered={isAnswered}>

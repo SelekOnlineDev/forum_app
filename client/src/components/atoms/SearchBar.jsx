@@ -13,7 +13,7 @@ const StyledInput = styled.input`
   padding: 10px 15px;
   background-color: #000;
   border: 1px solid #00ff00;
-  color: #00ff00;
+  color: #666666;
   font-family: 'Courier New', Courier, monospace;
   border-radius: 4px;
   font-size: 1rem;

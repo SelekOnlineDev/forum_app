@@ -8,7 +8,7 @@ const PaginationWrapper = styled.div`
 `;
 
 const PageButton = styled.button`
-  background-color: ${({ active }) => (active ? '#00ff00' : '#000')};
+  background-color: ${({ $active }) => ($active ? '#666666' : '#000')};
   color: #666666;
   border: 1px solid #00ff00;
   padding: 6px 12px;
@@ -23,19 +23,35 @@ const PageButton = styled.button`
 `;
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const pages = [];
+
+  for (let i = 1; i <= totalPages; i++) {
+    pages.push(
+      <PageButton 
+        key={i}
+        $active={currentPage === i}
+        onClick={() => onPageChange(i)}
+      >
+        {i}
+      </PageButton>
+    );
+  }
 
   return (
     <PaginationWrapper>
-      {pages.map((page) => (
-        <PageButton
-          key={page}
-          active={page === currentPage}
-          onClick={() => onPageChange(page)}
-        >
-          {page}
+      {currentPage > 1 && (
+        <PageButton onClick={() => onPageChange(currentPage - 1)}>
+          &lt;
         </PageButton>
-      ))}
+      )}
+      
+      {pages}
+      
+      {currentPage < totalPages && (
+        <PageButton onClick={() => onPageChange(currentPage + 1)}>
+          &gt;
+        </PageButton>
+      )}
     </PaginationWrapper>
   );
 };

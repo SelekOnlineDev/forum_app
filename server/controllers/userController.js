@@ -24,6 +24,8 @@ export const registerUser = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
+     await users.insertOne(newUser);
+
      const token = jwt.sign(
       { id: newUser._id, name: newUser.name, email: newUser.email },
       process.env.JWT_SECRET,
@@ -99,18 +101,17 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const response = await api.patch('/user/profile', { name, email });
-
     const updatedUser = await users.findOne({ _id: userId });
     res.status(200).json({
       message: 'Profile updated successfully',
       user: {
+        id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email
       }
     });
 
-    res.status(200).json({ message: 'Profile updated', user: { name, email } });
+    res.status(200).json({ message: 'Profile updated', user: { name, email, _id } });
   } catch (err) {
     console.error('Profile update error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -124,29 +125,48 @@ export const updatePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    const response = await api.patch( {
-      currentPassword: password,
-      newPassword
-    });
+    console.log(`Password update attempt for user: ${userId}`);
 
     // Randu vartotoją
-
+    
     const user = await users.findOne({ _id: userId });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      console.log('User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    console.log('User found:', user.email);
 
     // Tikrinu slaptažodį
 
+    console.log('Comparing passwords...');
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid current password' });
+    
+    if (!isMatch) {
+      console.log('Password comparison failed');
+      return res.status(401).json({ message: 'Invalid current password' });
+    }
+
+    console.log('Password matched, hashing new password...');
 
     // Šifruoju naują slaptažodį
 
     const hashed = await bcrypt.hash(newPassword, 10);
-    await users.updateOne(
+    
+    console.log('Updating password in database...');
+    const result = await users.updateOne(
       { _id: userId },
       { $set: { password: hashed } }
     );
 
+    console.log('Update result:', result);
+
+    if (result.modifiedCount === 0) {
+      console.log('No documents modified');
+      return res.status(500).json({ message: 'Password not updated' });
+    }
+
+    console.log('Password updated successfully');
     res.status(200).json({ message: 'Password updated' });
   } catch (err) {
     console.error('Password update error:', err);

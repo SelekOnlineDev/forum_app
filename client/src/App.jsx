@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { UserProvider } from './context/UserContext';
 import { useUser } from './context/UserContext';
 import MainOutlet from './components/MainOutlet';
+import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -48,6 +49,7 @@ const AutoLogoutHandler = ({ children }) => {
 function App() {
   return (
     <UserProvider>
+      <ErrorBoundary>
       <AutoLogoutHandler>
         <Router>
           <AppContainer>
@@ -66,6 +68,7 @@ function App() {
           </AppContainer>
         </Router>
       </AutoLogoutHandler>
+      </ErrorBoundary>
     </UserProvider>
   );
 }

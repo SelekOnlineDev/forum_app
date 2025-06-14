@@ -2,13 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
-import { 
-  getAllQuestions,
-  createQuestion,
-  getQuestionById,
-  deleteQuestion,
-  updateQuestion
-} from './controllers/questionController.js';
 import userRoutes from './routes/userRoutes.js';
 import questionRoutes from './routes/questionRoutes.js';
 import answerRoutes from './routes/answerRoutes.js';
@@ -19,6 +12,53 @@ if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not defined in .env file');
   process.exit(1);
 };
+
+const fixLikesDislikes = async () => {
+  try {
+    const db = await getDb();
+    const questions = db.collection('questions');
+    
+    // Atnaujinu visus dokumentus, kur "likes" yra masyvas
+
+    await questions.updateMany(
+      { likes: { $type: 'array' } },
+      [{ 
+        $set: { 
+          likes: { 
+            $cond: {
+              if: { $gt: [{ $size: "$likes" }, 0] },
+              then: { $arrayElemAt: ["$likes", 0] },
+              else: 0
+            }
+          } 
+        }
+      }]
+    );
+    
+    // Atnaujinu visus dokumentus, kur "dislikes" yra masyvas
+
+    await questions.updateMany(
+      { dislikes: { $type: 'array' } },
+      [{ 
+        $set: { 
+          dislikes: { 
+            $cond: {
+              if: { $gt: [{ $size: "$dislikes" }, 0] },
+              then: { $arrayElemAt: ["$dislikes", 0] },
+              else: 0
+            }
+          } 
+        }
+      }]
+    );
+    
+    console.log('Likes and dislikes fixed successfully');
+  } catch (err) {
+    console.error('Error fixing likes and dislikes:', err);
+  }
+};
+
+// Iškviečiu funkciją fixLikesDislikes() prieš serverio paleidimą
 
 const app = express();
 const PORT = process.env.PORT || 5501;

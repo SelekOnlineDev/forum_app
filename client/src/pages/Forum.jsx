@@ -46,7 +46,7 @@ const Filters = styled.div`
 `;
 
 const FilterButton = styled(Button)`
-  background-color: ${({ $active }) => $active ? '#00ff00' : '#666666'};
+  background-color: ${({ $active }) => $active ? '#00ff00' : '#00ff00'};
   color: ${({ $active }) => $active ? '#000' : '#000'};
   font-size: 0.9rem;
   padding: 8px 15px;
@@ -62,7 +62,8 @@ const Forum = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all');
+  const [selectedTag, setSelectedTag] = useState('');
+  const [filter] = useState('all');
   const [sort, setSort] = useState('newest');
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -75,23 +76,28 @@ const Forum = () => {
 
    useEffect(() => {
     console.log("Fetched questions:", questions);
-    async function fetchQuestions() {
-      setLoading(true);
+    const fetchQuestions = async () => {
       try {
         const res = await api.get(
-          `/questions?page=${pagination.page}&filter=${filter}&sort=${sort}&search=${encodeURIComponent(searchTerm)}`
+            `/questions?page=${pagination.page}&limit=${pagination.limit}&filter=${filter}&sort=${sort}&search=${searchTerm}`
         );
-        setQuestions(res.data);
+        if (res.data && Array.isArray(res.data.questions || [])) {
+        setQuestions(res.data.questions);
         setPagination(prev => ({
           ...prev,
-          total: parseInt(res.headers['x-total-count'] || '0', 10),
+          total: res.data.total || 0
         }));
-      } catch (err) {
-        console.error(err);
+      } else {
+        setQuestions([]);
+        console.error('Invalid response format:', res);
       }
-      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+      setQuestions([]);
     }
-    fetchQuestions();
+    setLoading(false);
+  };
+  fetchQuestions();
   }, [searchTerm, filter, sort, pagination.page]);
 
   const handleAsk = () => user ? navigate('/ask') : navigate('/login');
@@ -125,23 +131,23 @@ const Forum = () => {
 
         <Filters>
           <span style={{ color: '#00ff00' }}>Filter:</span>
-          {['all', 'answered', 'unanswered'].map(f => (
+          {['All', 'Answered', 'Unanswered'].map(tag => (
             <FilterButton
-              key={f}
-              $active={filter === f}
-              onClick={() => setFilter(f)}
+              key={tag}
+              $active={selectedTag === tag.toLowerCase()}
+              onClick={() => setSelectedTag(tag.toLowerCase())}
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {tag.charAt(0).toUpperCase() + tag.slice(1)}
             </FilterButton>
           ))}
           <span style={{ color: '#00ff00', marginLeft: 20 }}>Sort:</span>
-          {['newest', 'popular'].map(s => (
+          {['Newest', 'Popular'].map(s => (
             <FilterButton
               key={s}
               $active={sort === s}
               onClick={() => setSort(s)}
             >
-              {s === 'popular' ? 'Most Answers' : 'Newest'}
+              {s === 'Popular' ? 'Most Answered' : 'Newest'}
             </FilterButton>
           ))}
         </Filters>
@@ -149,7 +155,7 @@ const Forum = () => {
         {loading && <div style={{ color: '#00ff00' }}>Loading questions...</div>}
         {!loading && questions.length === 0 && (
           <div style={{ color: '#00ff00', textAlign: 'center' }}>No questions found</div>
-        )}
+        )};
 
         <QuestionsList>
           {questions.map(q => (

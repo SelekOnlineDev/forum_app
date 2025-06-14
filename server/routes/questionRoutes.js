@@ -6,6 +6,8 @@ import {
   getQuestionById,
   deleteQuestion,
   updateQuestion,
+  likeQuestion, 
+  dislikeQuestion
 } from '../controllers/questionController.js';
 import { 
   getAnswersByQuestionId, 
@@ -22,5 +24,7 @@ router.delete('/questions/:id', authMiddleware, deleteQuestion);
 router.put('/questions/:id', authMiddleware, updateQuestion);
 router.get('/questions/:id/answers', getAnswersByQuestionId);
 router.post('/questions/:id/answers', authMiddleware, createAnswer);
+router.post('/questions/:id/like', authMiddleware, likeQuestion);
+router.post('/questions/:id/dislike', authMiddleware, dislikeQuestion);
 
 export default router;

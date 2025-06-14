@@ -17,7 +17,9 @@ export const getAllQuestions = async (req, res) => {
         { description: { $regex: search, $options: 'i' } }
       ];
     }
-    
+    if (req.query.tag) {
+      query.tags = req.query.tag;
+    }
     if (filter === 'answered') {
       query.answerCount = { $gt: 0 };  // Tik atsakyti klausimai
     }   
@@ -27,16 +29,17 @@ export const getAllQuestions = async (req, res) => {
     
     let sortOption = { createdAt: -1 };
     if (sort === 'popular') {
-      sortOption = { answerCount: -1 };
+      sortOption = { likes: -1 };
     }
     
     const questions = await db.collection('questions')
       .find(query)
+      .sort(sortOption)
       .skip(skip)
       .limit(limit)
       .toArray();
 
-    const total = await db.collection('questions').countDocuments();
+    const total = await db.collection('questions').countDocuments(query);
       
     // Gaunu atsakymus kiekvienam klausimui
 
@@ -47,7 +50,12 @@ export const getAllQuestions = async (req, res) => {
       question.answers = answers;
     }
 
-    res.status(200).json(questions);
+    res.status(200).json({
+      questions, 
+      total, 
+      page,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (err) {
     console.error('Error getting questions:', err);
     res.status(500).json({ message: 'Server error' });
@@ -128,7 +136,7 @@ export const updateQuestion = async (req, res) => {
     // Atnaujinu klausimą
     const result = await db.collection('questions').updateOne(
       { _id: req.params.id },
-      { $set: { question: updatedQuestion } }
+      { $set: { question: updatedQuestion, updatedAt: new Date().toISOString()}},
     );
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'Question not found' });
@@ -139,3 +147,87 @@ export const updateQuestion = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const likeQuestion = async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    // Pirmiausia gauti klausimą
+
+    const question = await db.collection('questions').findOne({ _id: id });
+    
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    // Patikrinu ar vartotojas jau "like"
+
+    if (question.likedBy?.includes(userId)) {
+      return res.status(400).json({ message: 'You have already liked this question' });
+    }
+    
+    // Konvertuoju "likes" į skaičių (jei tai masyvas) ir atnaujinu
+
+    const currentLikes = Array.isArray(question.likes) ? 
+      question.likes[0] : 
+      question.likes;
+    
+    // Atnaujinu su nauja reikšme ir vartotojo ID
+
+    await db.collection('questions').updateOne(
+      { _id: id },
+      { 
+        $set: { likes: currentLikes + 1 },
+        $push: { likedBy: userId },
+        $pull: { dislikedBy: userId } // Pašalinu iš priešingos kategorijos
+      }
+    );
+    
+    res.status(200).json({ message: 'Question liked' });
+  } catch (err) {
+    console.error('Error liking question:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const dislikeQuestion = async (req, res) => {
+  try {
+    const db = await getDb();
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    // Pirmiausia gauti klausimą
+
+    const question = await db.collection('questions').findOne({ _id: id });
+    
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+    
+    // Konvertuoju dislikes į skaičių (jei tai masyvas) ir atnaujinu
+
+    const currentDislikes = Array.isArray(question.dislikes) ? 
+      question.dislikes[0] : 
+      question.dislikes;
+    
+    // Atnaujinu su nauja reikšme
+
+    await db.collection('questions').updateOne(
+      { _id: id },
+      { 
+        $set: { likes: currentDislikes + 1 },
+        $push: { dislikedBy: userId },
+        $pull: { likedBy: userId } // Pašalinu iš priešingos kategorijos
+      }
+    );
+    
+    res.status(200).json({ message: 'Question disliked' });
+  } catch (err) {
+    console.error('Error disliking question:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
