@@ -123,17 +123,19 @@ export const updateQuestion = async (req, res) => {
     const db = await getDb();
     const { question: updatedQuestion } = req.body;
 
-     // Randu klausimą, pradedu savininko patikrinimą
+    // Randu klausimą, pradedu savininko patikrinimą
 
     const existingQuestion = await db.collection('questions').findOne({ _id: req.params.id });
     if (!existingQuestion) {
       return res.status(404).json({ message: 'Question not found' });
     }
-     // Tikrinu ar vartotojas yra savininkas
+    // Tikrinu ar vartotojas yra savininkas
+
     if (existingQuestion.userId !== req.user.id) {
       return res.status(403).json({ message: 'Unauthorized' });
     }
     // Atnaujinu klausimą
+
     const result = await db.collection('questions').updateOne(
       { _id: req.params.id },
       { $set: { question: updatedQuestion, updatedAt: new Date().toISOString()}},
