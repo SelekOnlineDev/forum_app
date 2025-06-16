@@ -71,8 +71,10 @@ const Forum = () => {
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 3,
-    total: 0
+    total: 0,
+    totalPages: 1
   });
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
    useEffect(() => {
     console.log("Fetched questions:", questions);
@@ -81,15 +83,16 @@ const Forum = () => {
         const res = await api.get(
             `/questions?page=${pagination.page}&limit=${pagination.limit}&filter=${filter}&sort=${sort}&search=${searchTerm}`
         );
-        if (res.data && Array.isArray(res.data.questions || [])) {
-        setQuestions(res.data.questions);
-        setPagination(prev => ({
-          ...prev,
-          total: res.data.total || 0
-        }));
+        if (res.data) {
+          setQuestions(res.data.questions || []);
+          setPagination({
+            page: res.data.page,
+            total: res.data.total,
+            totalPages: res.data.totalPages,
+            limit: pagination.limit
+        });
       } else {
         setQuestions([]);
-        console.error('Invalid response format:', res);
       }
     } catch (err) {
       console.error('Error fetching questions:', err);
@@ -98,7 +101,7 @@ const Forum = () => {
     setLoading(false);
   };
   fetchQuestions();
-  }, [searchTerm, filter, sort, pagination.page]);
+  }, [searchTerm, filter, sort, pagination.page, refreshCounter]);
 
   const handleAsk = () => user ? navigate('/ask') : navigate('/login');
 
@@ -111,11 +114,50 @@ const Forum = () => {
     try {
       await api.delete(`/questions/${questionToDelete}`);
       setQuestions(qs => qs.filter(q => q._id !== questionToDelete));
+      setRefreshCounter(prev => prev + 1);
     } catch (err) {
       console.error(err);
     }
     setDeleteModalOpen(false);
   };
+
+  const handleLike = async (questionId) => {
+  try {
+    await api.post(`/questions/${questionId}/like`);
+
+    // Atnaujinti būseną
+
+    setQuestions(prev => prev.map(q => 
+      q._id === questionId ? { ...q, 
+        likes: (q.likes || 0) + 1, 
+        dislikes: q.userDisliked ? (q.dislikes || 0) - 1 : q.dislikes, // Pašalina "dislike" jei buvo
+        userLiked: true,
+        userDisliked: false } : q
+    ));
+    setRefreshCounter(prev => prev + 1);
+  } catch (err) {
+    console.error('Error liking question:', err);
+  }
+};
+
+  const handleDislike = async (questionId) => {
+  try {
+    await api.post(`/questions/${questionId}/dislike`);
+
+    // Atnaujinti būseną
+
+    setQuestions(prev => prev.map(q => 
+      q._id === questionId ? { ...q,
+        dislikes: (q.dislikes || 0) + 1, 
+        likes: q.userLiked ? (q.likes || 0) - 1 : q.likes, // Pašalina "like" jei buvo
+        userDisliked: true,
+        userLiked: false } : q
+    ));
+    setRefreshCounter(prev => prev + 1); 
+  } catch (err) {
+    console.error('Error disliking question:', err);
+  }
+};
 
   return (
     <PageContainer>
@@ -161,15 +203,21 @@ const Forum = () => {
           {questions.map(q => (
             <QuestionCard
               key={q._id}
-              question={q.question}
+              id={q._id}
+              questionData={q.question}
+              description={q.description}
               answers={q.answers}
-              answerCount={q.answers.length}
+              answerCount={q.answerCount || 0}
               userName={q.userName}
               createdAt={q.createdAt}
+              likes={q.likes || 0}
+              dislikes={q.dislikes || 0}
               isOwner={user && user.id === q.userId}
               onDelete={() => handleDeleteClick(q._id)}
               onEdit={() => navigate('/ask', { state: { questionToEdit: q } })}
               onClick={() => navigate(`/question/${q._id}`)}
+              onLike={() => handleLike(q._id)}
+              onDislike={() => handleDislike(q._id)}
             />
           ))}
         </QuestionsList>

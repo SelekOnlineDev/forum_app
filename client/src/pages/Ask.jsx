@@ -35,6 +35,7 @@ const Ask = () => {
   const [question, setQuestion] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [forceRefresh, setForceRefresh] = useState(false);
   
   // Tikrinu ar redaguojamas esamas klausimas
 
@@ -68,6 +69,7 @@ const Ask = () => {
         // Kuriamas naujas klausimas
         await api.post('/questions', { question });
         setSuccess('Question created successfully!');
+        setForceRefresh(!forceRefresh); // Priverstinis atnaujinimas
       }
       
       setTimeout(() => navigate('/forum'), 1500);

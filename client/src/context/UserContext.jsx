@@ -16,6 +16,8 @@ function reducer(state, action) {
       return { ...state, user: null, loading: false };
     case ACTIONS.SET_LOADING:
       return { ...state, loading: action.payload };
+    case ACTIONS.UPDATE_USER: 
+      return { ...state, user: { ...state.user, ...action.payload } };
     default:
       return state;
   }
@@ -44,6 +46,10 @@ export function UserProvider({ children }) {
     if (logoutTimer.current) clearTimeout(logoutTimer.current);
   };
 
+  const updateUser = (userData) => {
+    dispatch({ type: ACTIONS.UPDATE_USER, payload: userData });
+  };
+
   const resetLogoutTimer = () => startTimer();
 
   useEffect(() => {
@@ -56,25 +62,19 @@ export function UserProvider({ children }) {
     
     try {
       const decoded = jwt_decode(token);
+      const expirationTime = decoded.exp * 1000;
       
       if (decoded.exp * 1000 < Date.now()) {
         handleLogout();
       } else {
-        dispatch({ 
-          type: ACTIONS.LOGIN, 
-          payload: {
-            id: decoded.id,
-            name: decoded.name,
-            email: decoded.email
-          }
-        });
-        startTimer();
-      }
-    } catch (err) {
-      console.error('Token decode error:', err);
-      handleLogout();
+        const timeUntilExpiration = expirationTime - Date.now();
+        logoutTimer.current = setTimeout(handleLogout, timeUntilExpiration);
     }
-  }, []);
+  } catch (err) {
+    console.error('Token decode error:', err);
+    handleLogout();
+  }
+}, []);
 
   return (
     <UserContext.Provider
@@ -83,7 +83,8 @@ export function UserProvider({ children }) {
         loading: state.loading,
         login: handleLogin,
         logout: handleLogout,
-        resetLogoutTimer
+        resetLogoutTimer,
+        updateUser
       }}
     >
       {children}
@@ -94,5 +95,10 @@ export function UserProvider({ children }) {
 export function useUser() {
   const ctx = useContext(UserContext);
   if (!ctx) throw new Error('useUser used outside UserProvider');
-  return ctx;
+  return {
+    ...ctx,
+    resetLogoutTimer: ctx.resetLogoutTimer
+  };
 }
+
+

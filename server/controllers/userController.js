@@ -111,7 +111,6 @@ export const updateProfile = async (req, res) => {
       }
     });
 
-    res.status(200).json({ message: 'Profile updated', user: { name, email, _id } });
   } catch (err) {
     console.error('Profile update error:', err);
     res.status(500).json({ message: 'Server error' });

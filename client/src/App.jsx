@@ -28,18 +28,11 @@ const AutoLogoutHandler = ({ children }) => {
   useEffect(() => {
     const resetTimer = () => resetLogoutTimer?.();
     
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('keydown', resetTimer);
-    window.addEventListener('scroll', resetTimer);
-    window.addEventListener('click', resetTimer);
-    window.addEventListener('touchstart', resetTimer);
+    const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
     
     return () => {
-      window.removeEventListener('mousemove', resetTimer);
-      window.removeEventListener('keydown', resetTimer);
-      window.removeEventListener('scroll', resetTimer);
-      window.removeEventListener('click', resetTimer);
-      window.removeEventListener('touchstart', resetTimer);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
     };
   }, [resetLogoutTimer]);
 

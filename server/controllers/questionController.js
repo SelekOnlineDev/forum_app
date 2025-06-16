@@ -75,7 +75,7 @@ export const createQuestion = async (req, res) => {
       return res.status(400).json({ message: 'Question too short' });
 }
     const result = await db.collection('questions').insertOne(newQuestion);
-    res.status(201).json({ message: 'Question created', id: result.insertedId });
+    res.status(201).json({ message: 'Question created',question: newQuestion, id: result.insertedId });
   } catch (err) {
     console.error('Error creating question:', err);
     res.status(500).json({ message: 'Server error' });
@@ -231,5 +231,3 @@ export const dislikeQuestion = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-

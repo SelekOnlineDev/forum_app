@@ -55,46 +55,46 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const QuestionCard = ({ question, onDelete, isOwner, onLike, onDislike }) => {
-  const isAnswered = question.answers?.length > 0 || false;
+const QuestionCard = ({ questionData, onDelete, isOwner, onLike, onDislike }) => {
+  const isAnswered = questionData.answers?.length > 0 || false;
   // const likes = question.likes || 0;
 
   return (
     <Card>
-      <Title>{question.title}</Title>
+      <Title>{questionData.title}</Title>
 
-      <LikeButton onClick={() => onLike(question._id)}>
-        👍 {question.likes || 0}
+      <LikeButton onClick={() => onLike(questionData._id)}>
+        👍 {questionData.likes || 0}
       </LikeButton>
-      <LikeButton onClick={() => onDislike(question._id)}>
-        👎 {question.dislikes || 0}
+      <LikeButton onClick={() => onDislike(questionData._id)}>
+        👎 {questionData.dislikes || 0}
       </LikeButton>
 
-      {question.updatedAt && (
+      {questionData.updatedAt && (
         <span style={{ color: '#666', fontSize: '0.8rem' }}>
           (edited)
         </span>
       )}
 
-      {question.answers?.slice(0, 3).map((answer) => (
+      {questionData.answers?.slice(0, 3).map((answer) => (
         <div key={answer._id || Math.random()} style={{ marginTop: '10px', color: '#00ff00' }}>
           <strong>A:</strong> {answer.answer}
         </div>
       ))}
 
-      {question.answers?.length > 3 && (
+      {questionData.answers?.length > 3 && (
         <div style={{ color: '#00ff00', marginTop: '5px' }}>
-          +{question.answers.length - 3} more answers
+          +{questionData.answers.length - 3} more answers
         </div>
       )}
 
       <Meta>
         <div>
-          Author: {question.userName} •{' '}
-          {new Date(question.createdAt).toLocaleDateString()}
+          Author: {questionData.userName} •{' '}
+          {new Date(questionData.createdAt).toLocaleDateString()}
         </div>
         <Badge $answered={isAnswered}>
-          {isAnswered ? `${question.answers.length} Answers` : 'No answer'}
+          {isAnswered ? `${questionData.answers.length} Answers` : 'No answer'}
         </Badge>
       </Meta>
 

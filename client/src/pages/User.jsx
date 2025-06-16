@@ -115,15 +115,19 @@ const User = () => {
       const response = await api.patch('user/profile', { name, email });
       
       if (response.status === 200) {
-        updateUser({ name, email });
-        updateUser(response.data.user);
-        setSuccess('Profile updated successfully');
-        setErrors({});
-        setIsEditing(false);
-        
-        // Išvalau pranešimą po 5 sekundžių
+        updateUser({ 
+        ...user, 
+        name: response.data.user.name, 
+        email: response.data.user.email 
+      });
 
-        setTimeout(() => setSuccess(''), 5000);
+         // Atnaujinu lokalų state
+
+        setName(response.data.user.name);
+        setEmail(response.data.user.email);
+        setSuccess('Profile updated successfully');
+        setIsEditing(false); // Išjungiu redagavimo režimą
+        setTimeout(() => setSuccess(''), 5000); // Išvalau pranešimą po 5 sekundžių
       }
     } catch (err) {
       setErrors({ 
