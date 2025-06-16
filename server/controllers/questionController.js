@@ -32,21 +32,63 @@ export const getAllQuestions = async (req, res) => {
       sortOption = { likes: -1 };
     }
     
-    const questions = await db.collection('questions')
-      .find(query)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+    // Gaunu klausimus su vartotojų informacija
+
+    const questions = await db.collection('questions').aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          _id: 1,
+          question: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          likes: 1,
+          dislikes: 1,
+          answerCount: 1,
+          userName: "$user.name"
+        }
+      },
+      { $match: query },
+      { $sort: sortOption },
+      { $skip: skip },
+      { $limit: limit }
+    ]).toArray();
 
     const total = await db.collection('questions').countDocuments(query);
       
     // Gaunu atsakymus kiekvienam klausimui
 
     for (const question of questions) {
-      const answers = await db.collection('answers')
-        .find({ questionId: question._id })
-        .toArray();
+      const answers = await db.collection('answers').aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user"
+          }
+        },
+        { $unwind: "$user" },
+        {
+          $project: {
+            _id: 1,
+            answer: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            userName: "$user.name"
+          }
+        },
+        { $match: { questionId: question._id } }
+      ]).toArray();
+      
       question.answers = answers;
     }
 
@@ -231,3 +273,4 @@ export const dislikeQuestion = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+

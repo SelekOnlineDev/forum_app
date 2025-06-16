@@ -55,29 +55,39 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const QuestionCard = ({ questionData, onDelete, isOwner, onLike, onDislike }) => {
+const QuestionCard = ({ 
+  questionData, 
+  onDelete, 
+  isOwner, 
+  onLike, 
+  onDislike,
+  onClick 
+  }) => {
   const isAnswered = questionData.answers?.length > 0;
+  const displayedAnswers = questionData.answers?.slice(0, 3) || [];
 
   return (
-    <Card>
+    <Card onClick={onClick}>
       <Title>{questionData.question}</Title>
 
-      <LikeButton onClick={() => onLike(questionData._id)}>
-        👍 {questionData.likes || 0}
-      </LikeButton>
-      <LikeButton onClick={() => onDislike(questionData._id)}>
-        👎 {questionData.dislikes || 0}
-      </LikeButton>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+        <LikeButton onClick={(e) => { e.stopPropagation(); onLike(questionData._id); }}>
+          👍 {questionData.likes || 0}
+        </LikeButton>
+        <LikeButton onClick={(e) => { e.stopPropagation(); onDislike(questionData._id); }}>
+          👎 {questionData.dislikes || 0}
+        </LikeButton>
+      </div>
 
-      {questionData.updatedAt && (
-        <span style={{ color: '#666', fontSize: '0.8rem' }}>
-          (edited)
-        </span>
-      )}
-
-      {questionData.answers?.slice(0, 3).map((answer) => (
-        <div key={answer._id || Math.random()} style={{ marginTop: '10px', color: '#00ff00' }}>
-          <strong>A:</strong> {answer.answer}
+      {displayedAnswers.map((answer) => (
+        <div key={answer._id} style={{ marginTop: '10px', color: '#00ff00' }}>
+          <div>
+            <strong>{answer.userName || 'User'}:</strong> {answer.answer}
+          </div>
+          <div style={{ fontSize: '0.8rem', color: '#666' }}>
+            {new Date(answer.createdAt).toLocaleDateString()}
+            {answer.updatedAt && ' (edited)'}
+          </div>
         </div>
       ))}
 
@@ -87,10 +97,47 @@ const QuestionCard = ({ questionData, onDelete, isOwner, onLike, onDislike }) =>
         </div>
       )}
 
+      <div>
+        {questionData.answers?.map((answer) => (
+          <div key={answer._id}>
+            <strong>{answer.userName}:</strong> {answer.answer}
+            <div>
+              {new Date(answer.createdAt).toLocaleDateString()}
+              {answer.updatedAt && ' (edited)'}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div>
+      {questionData.updatedAt && (
+        <span style={{ color: '#666', fontSize: '0.8rem' }}>
+          (edited)
+        </span>
+      )}
+      </div>
+
+      <div>
+      {questionData.answers?.slice(0, 3).map((answer) => (
+        <div key={answer._id || Math.random()} style={{ marginTop: '10px', color: '#00ff00' }}>
+          <strong>A:</strong> {answer.answer}
+        </div>
+      ))}
+      </div>
+
+      <div>
+      {questionData.answers?.length > 3 && (
+        <div style={{ color: '#00ff00', marginTop: '5px' }}>
+          +{questionData.answers.length - 3} more answers
+        </div>
+      )}
+      </div>
+
       <Meta>
         <div>
           Author: {questionData.userName} •{' '}
           {new Date(questionData.createdAt).toLocaleDateString()}
+          {questionData.updatedAt && ' (edited)'}
         </div>
         <Badge $answered={isAnswered}>
           {isAnswered ? `${questionData.answers.length} Answers` : 'No answer'}

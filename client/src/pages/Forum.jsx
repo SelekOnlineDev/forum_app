@@ -75,6 +75,7 @@ const Forum = () => {
     totalPages: 1
   });
   const [refreshCounter, setRefreshCounter] = useState(0);
+  const [expandedQuestionId, setExpandedQuestionId] = useState(null);
 
    useEffect(() => {
     console.log("Fetched questions:", questions);
@@ -156,6 +157,10 @@ const Forum = () => {
   }
 };
 
+  const toggleAnswers = (id) => {
+    setExpandedQuestionId(expandedQuestionId === id ? null : id);
+};
+
   return (
     <PageContainer>
       <ForumContainer>
@@ -198,24 +203,38 @@ const Forum = () => {
 
         <QuestionsList>
           {questions.map(q => (
-            <QuestionCard
-              key={q._id}
-              id={q._id}
-              questionData={q}
-              description={q.description}
-              answers={q.answers}
-              answerCount={q.answerCount || 0}
-              userName={q.userName}
-              createdAt={q.createdAt}
-              likes={q.likes || 0}
-              dislikes={q.dislikes || 0}
-              isOwner={user && user.id === q.userId}
-              onDelete={() => handleDeleteClick(q._id)}
-              onEdit={() => navigate('/ask', { state: { questionToEdit: q } })}
-              onClick={() => navigate(`/question/${q._id}`)}
-              onLike={() => handleLike(q._id)}
-              onDislike={() => handleDislike(q._id)}
-            />
+            <React.Fragment key={q._id}>
+              <QuestionCard
+                questionData={q}
+                isOwner={user && user.id === q.userId}
+                onDelete={() => handleDeleteClick(q._id)}
+                onEdit={() => navigate('/ask', { state: { questionToEdit: q } })}
+                onClick={() => toggleAnswers(q._id)}
+                onLike={() => handleLike(q._id)}
+                onDislike={() => handleDislike(q._id)}
+              />
+              
+              {expandedQuestionId === q._id && (
+                <div className="expanded-answers" style={{ 
+                  background: '#111', 
+                  padding: '10px', 
+                  marginTop: '-10px',
+                  border: '1px solid #00ff00'
+                }}>
+                  {q.answers?.slice(3).map(answer => (
+                    <div key={answer._id} style={{ marginBottom: '10px' }}>
+                      <div style={{ color: '#00ff00' }}>
+                        <strong>{answer.userName || 'User'}:</strong> {answer.answer}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                        {new Date(answer.createdAt).toLocaleDateString()}
+                        {answer.updatedAt && ' (edited)'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </React.Fragment>
           ))}
         </QuestionsList>
 

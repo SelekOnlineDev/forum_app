@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef, useState } from 'react';
 import jwt_decode from 'jwt-decode';
 
 const initialState = { user: null, loading: true };
@@ -7,6 +7,7 @@ const ACTIONS = {
   LOGOUT: 'LOGOUT',
   SET_LOADING: 'SET_LOADING'
 };
+
 
 function reducer(state, action) {
   switch (action.type) {
@@ -27,7 +28,9 @@ const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
   const logoutTimer = useRef(null);
+  const [redirectAfterLogout, setRedirectAfterLogout] = useState(false);
 
   const startTimer = () => {
     if (logoutTimer.current) clearTimeout(logoutTimer.current);
@@ -44,6 +47,12 @@ export function UserProvider({ children }) {
     localStorage.removeItem('quantum_token');
     dispatch({ type: ACTIONS.LOGOUT });
     if (logoutTimer.current) clearTimeout(logoutTimer.current);
+    setShowTimeoutModal(true);
+    setRedirectAfterLogout(true);
+  };
+
+  const closeTimeoutModal = () => {
+    setShowTimeoutModal(false);
   };
 
   const updateUser = (userData) => {
@@ -61,7 +70,7 @@ export function UserProvider({ children }) {
     const resetTimer = () => {
       resetLogoutTimer();
     };
-    
+
     events.forEach(event => {
       window.addEventListener(event, resetTimer);
     });
@@ -71,7 +80,7 @@ export function UserProvider({ children }) {
         window.removeEventListener(event, resetTimer);
       });
     };
-  }, []);
+  }, [resetLogoutTimer]);
 
   useEffect(() => {
     const token = localStorage.getItem('quantum_token');
@@ -85,17 +94,17 @@ export function UserProvider({ children }) {
       const decoded = jwt_decode(token);
       const expirationTime = decoded.exp * 1000;
       
-      if (decoded.exp * 1000 < Date.now()) {
+      if (Date.now() > expirationTime) {
         handleLogout();
       } else {
         const timeUntilExpiration = expirationTime - Date.now();
         logoutTimer.current = setTimeout(handleLogout, timeUntilExpiration);
+      }
+    } catch (err) {
+      console.error('Token decode error:', err);
+      handleLogout();
     }
-  } catch (err) {
-    console.error('Token decode error:', err);
-    handleLogout();
-  }
-}, []);
+  }, []);
 
   return (
     <UserContext.Provider
@@ -105,7 +114,11 @@ export function UserProvider({ children }) {
         login: handleLogin,
         logout: handleLogout,
         resetLogoutTimer,
-        updateUser
+        updateUser,
+        showTimeoutModal,
+        closeTimeoutModal,
+        redirectAfterLogout,
+        setRedirectAfterLogout
       }}
     >
       {children}
@@ -118,8 +131,34 @@ export function useUser() {
   if (!ctx) throw new Error('useUser used outside UserProvider');
   return {
     ...ctx,
-    resetLogoutTimer: ctx.resetLogoutTimer
+    resetLogoutTimer: ctx.resetLogoutTimer,
+    showTimeoutModal: ctx.showTimeoutModal, 
+    closeTimeoutModal: ctx.closeTimeoutModal
   };
 }
 
+export const AutoLogoutHandler = ({ children }) => {
+  const { resetLogoutTimer, logout } = useUser();
 
+  useEffect(() => {
+    const events = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
+    let timeoutId;
+
+    const startTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        logout();
+      }, 5 * 60 * 1000); // 5 min
+    };
+
+    events.forEach(e => window.addEventListener(e, startTimer));
+    startTimer();
+
+    return () => {
+      events.forEach(e => window.removeEventListener(e, startTimer));
+      clearTimeout(timeoutId);
+    };
+  }, [resetLogoutTimer, logout]);
+
+  return children;
+};

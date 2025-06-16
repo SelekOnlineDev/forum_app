@@ -82,6 +82,7 @@ export default function QuestionDetail() {
   const [newAnswer, setNewAnswer] = useState('');
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState({ text: '', error: false });
+  const [showAnswerForm, setShowAnswerForm] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -110,8 +111,9 @@ export default function QuestionDetail() {
     try {
       await api.post(`/questions/${id}/answers`, { content: newAnswer });
       setNewAnswer('');
+      setShowAnswerForm(false);
       setMsg({ text: 'Answer posted successfully!', error: false });
-      load();
+      load(); // Perkraunu duomenis
     } catch (err) {
       console.error(err);
       setMsg({ text: 'Failed to post answer', error: true });
@@ -174,6 +176,30 @@ export default function QuestionDetail() {
       )}
       
       <h3>Answers ({answers.length})</h3>
+
+      {!showAnswerForm ? (
+        <Button 
+          onClick={() => setShowAnswerForm(true)}
+          style={{ marginBottom: '20px' }}
+        >
+          Add Answer
+        </Button>
+      ) : (
+        <div style={{ marginBottom: '20px' }}>
+          <TextArea
+            rows="4"
+            value={newAnswer}
+            onChange={(e) => setNewAnswer(e.target.value)}
+            placeholder="Write your answer here..."
+          />
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <Button onClick={postAnswer}>Submit Answer</Button>
+            <Button variant="danger" onClick={() => setShowAnswerForm(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
       
       {answers.length === 0 ? (
         <p>No answers yet. Be the first to answer!</p>
@@ -215,6 +241,19 @@ export default function QuestionDetail() {
                     >
                       Delete
                     </Button>
+                    {showAnswerForm ? (
+                      <div>
+                        <textarea
+                          value={newAnswer}
+                          onChange={(e) => setNewAnswer(e.target.value)}
+                        />
+                        <button onClick={postAnswer}>Submit</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setShowAnswerForm(true)}>
+                        Answer
+                      </button>
+                    )}
                   </AnswerActions>
                 )}
               </>

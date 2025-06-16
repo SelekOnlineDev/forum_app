@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate  } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
 import { useUser } from './context/UserContext';
 import MainOutlet from './components/MainOutlet';
@@ -11,6 +11,7 @@ import Forum from './pages/Forum';
 import Ask from './pages/Ask';
 import User from './pages/User';
 import QuestionDetail from './pages/QuestionDetail'; 
+import TimeoutModal from './components/molecules/TimeoutModal';
 import styled from 'styled-components';
 
 const AppContainer = styled.div`
@@ -39,28 +40,61 @@ const AutoLogoutHandler = ({ children }) => {
   return children;
 };
 
+function AppContent() {
+  const { 
+    showTimeoutModal, 
+    closeTimeoutModal, 
+    redirectAfterLogout,
+    setRedirectAfterLogout
+  } = useUser();
+  
+  const navigate = useNavigate();
+
+  // Redirect po atsijungimo
+
+  React.useEffect(() => {
+    if (redirectAfterLogout) {
+      navigate('/');
+      setRedirectAfterLogout(false);
+    }
+  }, [redirectAfterLogout, navigate, setRedirectAfterLogout]);
+
+  return (
+    <>
+      <AutoLogoutHandler>
+        <AppContainer>
+          <Routes>
+            <Route element={<MainOutlet />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/forum" element={<Forum />} />
+              <Route path="/ask" element={<Ask />} />
+              <Route path="/user" element={<User />} />
+              <Route path="/question/:id" element={<QuestionDetail />} />
+            </Route>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AppContainer>
+      </AutoLogoutHandler>
+      
+      {showTimeoutModal && (
+        <TimeoutModal
+          isOpen={showTimeoutModal}
+          onClose={closeTimeoutModal}
+        />
+      )}
+    </>
+  );
+}
+
 function App() {
   return (
     <UserProvider>
       <ErrorBoundary>
-      <AutoLogoutHandler>
         <Router>
-          <AppContainer>
-            <Routes>
-              <Route element={<MainOutlet />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/forum" element={<Forum />} />
-                <Route path="/ask" element={<Ask />} />
-                <Route path="/user" element={<User />} />
-                <Route path="/question/:id" element={<QuestionDetail />} />
-              </Route>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </AppContainer>
+          <AppContent />
         </Router>
-      </AutoLogoutHandler>
       </ErrorBoundary>
     </UserProvider>
   );
