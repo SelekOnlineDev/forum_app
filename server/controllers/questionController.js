@@ -208,28 +208,43 @@ export const likeQuestion = async (req, res) => {
 
     // Patikrinu ar vartotojas jau "like"
 
-    if (question.likedBy?.includes(userId)) {
-      return res.status(400).json({ message: 'You have already liked this question' });
+    const hasLiked = question.likedBy?.includes(userId);
+    const hasDisliked = question.dislikedBy?.includes(userId);
+
+    if (hasLiked) {
+
+      // Pašalinti like
+
+      await db.collection('questions').updateOne(
+        { _id: id },
+        { 
+          $inc: { likes: -1 },
+          $pull: { likedBy: userId }
+        }
+      );
+    } else {
+
+      // Pridėti like
+
+      const update = { 
+        $inc: { likes: 1 },
+        $addToSet: { likedBy: userId }
+      };
+      
+      // Pašalinti dislike jei buvo
+
+      if (hasDisliked) {
+        update.$inc.dislikes = -1;
+        update.$pull = { dislikedBy: userId };
+      }
+      
+      await db.collection('questions').updateOne(
+        { _id: id },
+        update
+      );
     }
     
-    // Konvertuoju "likes" į skaičių (jei tai masyvas) ir atnaujinu
-
-    const currentLikes = Array.isArray(question.likes) ? 
-      question.likes[0] : 
-      question.likes;
-    
-    // Atnaujinu su nauja reikšme ir vartotojo ID
-
-    await db.collection('questions').updateOne(
-      { _id: id },
-      { 
-        $set: { likes: currentLikes + 1 },
-        $push: { likedBy: userId },
-        $pull: { dislikedBy: userId } // Pašalinu iš priešingos kategorijos
-      }
-    );
-    
-    res.status(200).json({ message: 'Question liked' });
+    res.status(200).json({ message: 'Like updated' });
   } catch (err) {
     console.error('Error liking question:', err);
     res.status(500).json({ message: 'Server error' });
@@ -250,27 +265,47 @@ export const dislikeQuestion = async (req, res) => {
       return res.status(404).json({ message: 'Question not found' });
     }
     
-    // Konvertuoju dislikes į skaičių (jei tai masyvas) ir atnaujinu
+     // Patikrinti ar vartotojas jau "dislike"
 
-    const currentDislikes = Array.isArray(question.dislikes) ? 
-      question.dislikes[0] : 
-      question.dislikes;
-    
-    // Atnaujinu su nauja reikšme
+    const hasDisliked = question.dislikedBy?.includes(userId);
+    const hasLiked = question.likedBy?.includes(userId);
 
-    await db.collection('questions').updateOne(
-      { _id: id },
-      { 
-        $set: { likes: currentDislikes + 1 },
-        $push: { dislikedBy: userId },
-        $pull: { likedBy: userId } // Pašalinu iš priešingos kategorijos
+    if (hasLiked) {
+
+      // Pašalinti dislike
+
+      await db.collection('questions').updateOne(
+        { _id: id },
+        { 
+          $inc: { dislikes: -1 },
+          $pull: { dislikedBy: userId }
+        }
+      );
+    } else {
+
+      // Pridėti dislike
+
+      const update = { 
+        $inc: { dislikes: 1 },
+        $addToSet: { dislikedBy: userId }
+      };
+      
+      // Pašalinti like jei buvo
+
+      if (hasLiked) {
+        update.$inc.likes = -1;
+        update.$pull = { likedBy: userId };
       }
-    );
+      
+      await db.collection('questions').updateOne(
+        { _id: id },
+        update
+      );
+    }
     
-    res.status(200).json({ message: 'Question disliked' });
+    res.status(200).json({ message: 'Dislike updated' });
   } catch (err) {
     console.error('Error disliking question:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
-

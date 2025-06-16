@@ -9,7 +9,7 @@ const PaginationWrapper = styled.div`
 
 const PageButton = styled.button`
   background-color: ${({ $active }) => ($active ? '#666666' : '#000')};
-  color: #666666;
+  color: #00ff00;
   border: 1px solid #00ff00;
   padding: 6px 12px;
   margin: 0 4px;

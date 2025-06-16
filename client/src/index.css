@@ -18,3 +18,29 @@ input, textarea, button {
 * {
   box-sizing: border-box;
 }
+
+.expanded-answers {
+  background: #111;
+  padding: 10px;
+  margin-top: -10px;
+  border: 1px solid #00ff00;
+}
+
+.answer-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #000;
+}
+
+.answer-form textarea {
+  width: 100%;
+  background: #000;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}

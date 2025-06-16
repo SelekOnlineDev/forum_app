@@ -20,7 +20,7 @@ const Card = styled.div`
 const Title = styled.h3`
   color: #00ff00;
   margin-top: 0;
-  margin-right: 40px;
+  margin-right: 100px;
 `;
 
 const LikeButton = styled.button`
@@ -28,6 +28,9 @@ const LikeButton = styled.button`
   color: #00FF00;
   border: 1px solid #00FF00;
   border-radius: 4px;
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
 `;
 
 const Meta = styled.div`
@@ -55,26 +58,37 @@ const DeleteButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
+const AnswerButton = styled(Button)`
+  position: absolute;
+  top: 45px;
+  right: 15px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+`;
+
 const QuestionCard = ({ 
   questionData, 
   onDelete, 
   isOwner, 
   onLike, 
   onDislike,
-  onClick 
-  }) => {
-  const isAnswered = questionData.answers?.length > 0;
+  onClick,
+  onAnswer,
+  showAllAnswers
+}) => {
+  const isAnswered = questionData.answerCount > 0;
   const displayedAnswers = questionData.answers?.slice(0, 3) || [];
+  const shouldShowMore = questionData.answers?.length > 3 && !showAllAnswers;
 
   return (
     <Card onClick={onClick}>
       <Title>{questionData.question}</Title>
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-        <LikeButton onClick={(e) => { e.stopPropagation(); onLike(questionData._id); }}>
+        <LikeButton onClick={(e) => { e.stopPropagation(); onLike(); }}>
           👍 {questionData.likes || 0}
         </LikeButton>
-        <LikeButton onClick={(e) => { e.stopPropagation(); onDislike(questionData._id); }}>
+        <LikeButton onClick={(e) => { e.stopPropagation(); onDislike(); }}>
           👎 {questionData.dislikes || 0}
         </LikeButton>
       </div>
@@ -91,47 +105,22 @@ const QuestionCard = ({
         </div>
       ))}
 
-      {questionData.answers?.length > 3 && (
-        <div style={{ color: '#00ff00', marginTop: '5px' }}>
+      {shouldShowMore && (
+        <div 
+          style={{ 
+            color: '#00ff00', 
+            marginTop: '5px',
+            cursor: 'pointer',
+            textDecoration: 'underline'
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+        >
           +{questionData.answers.length - 3} more answers
         </div>
       )}
-
-      <div>
-        {questionData.answers?.map((answer) => (
-          <div key={answer._id}>
-            <strong>{answer.userName}:</strong> {answer.answer}
-            <div>
-              {new Date(answer.createdAt).toLocaleDateString()}
-              {answer.updatedAt && ' (edited)'}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div>
-      {questionData.updatedAt && (
-        <span style={{ color: '#666', fontSize: '0.8rem' }}>
-          (edited)
-        </span>
-      )}
-      </div>
-
-      <div>
-      {questionData.answers?.slice(0, 3).map((answer) => (
-        <div key={answer._id || Math.random()} style={{ marginTop: '10px', color: '#00ff00' }}>
-          <strong>A:</strong> {answer.answer}
-        </div>
-      ))}
-      </div>
-
-      <div>
-      {questionData.answers?.length > 3 && (
-        <div style={{ color: '#00ff00', marginTop: '5px' }}>
-          +{questionData.answers.length - 3} more answers
-        </div>
-      )}
-      </div>
 
       <Meta>
         <div>
@@ -140,7 +129,7 @@ const QuestionCard = ({
           {questionData.updatedAt && ' (edited)'}
         </div>
         <Badge $answered={isAnswered}>
-          {isAnswered ? `${questionData.answers.length} Answers` : 'No answer'}
+          {questionData.answerCount} {questionData.answerCount === 1 ? 'Answer' : 'Answers'}
         </Badge>
       </Meta>
 
@@ -156,6 +145,16 @@ const QuestionCard = ({
           Delete
         </DeleteButton>
       )}
+      
+      <AnswerButton 
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAnswer();
+        }}
+      >
+        Answer
+      </AnswerButton>
     </Card>
   );
 };

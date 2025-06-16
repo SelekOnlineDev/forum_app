@@ -13,6 +13,8 @@ const PageContainer = styled.div`
   background-image: url('/src/assets/matrix.png');
   position: relative;
   z-index: 1; 
+  min-height: 100vh;
+  padding: 20px 0;
 `;
 
 const ForumContainer = styled.div`
@@ -28,14 +30,18 @@ const Header = styled.div`
   margin-bottom: 25px;
   flex-wrap: wrap;
   gap: 15px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const Title = styled.h2`
   border: 2px solid #00ff00;
   border-radius: 4px;
-  flex-wrap: wrap;
-  padding: 13px 13px 13px 13px;
+  padding: 13px;
   background-color: #000;
+  margin: 0;
 `;
 
 const Filters = styled.div`
@@ -43,13 +49,20 @@ const Filters = styled.div`
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 25px;
+  align-items: center;
+
+  > span {
+    color: #00ff00;
+    font-weight: bold;
+  }
 `;
 
 const FilterButton = styled(Button)`
-  background-color: ${({ $active }) => $active ? '#00ff00' : '#00ff00'};
-  color: ${({ $active }) => $active ? '#000' : '#000'};
+  background-color: ${({ $active }) => $active ? '#00ff00' : '#000'};
+  color: ${({ $active }) => $active ? '#000' : '#00ff00'};
   font-size: 0.9rem;
   padding: 8px 15px;
+  border: 1px solid #00ff00;
 `;
 
 const QuestionsList = styled.div`
@@ -57,13 +70,39 @@ const QuestionsList = styled.div`
   gap: 20px;
 `;
 
+const AnswerFormContainer = styled.div`
+  margin-top: -15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #00ff00;
+  background: #000;
+`;
+
+const AnswerTextarea = styled.textarea`
+  width: 100%;
+  min-height: 100px;
+  background: #000;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+`;
+
+const ExpandedAnswersContainer = styled.div`
+  padding: 15px;
+  border: 1px solid #00ff00;
+  background: #000;
+  margin-top: -20px;
+  margin-bottom: 20px;
+`;
+
 const Forum = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
-  const [filter] = useState('all');
+  const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -75,15 +114,18 @@ const Forum = () => {
     totalPages: 1
   });
   const [refreshCounter, setRefreshCounter] = useState(0);
-  const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+  const [expandedAnswers, setExpandedAnswers] = useState({});
+  const [activeAnswerForm, setActiveAnswerForm] = useState(null);
+  const [answerContent, setAnswerContent] = useState('');
 
-   useEffect(() => {
-    console.log("Fetched questions:", questions);
+  useEffect(() => {
     const fetchQuestions = async () => {
       try {
+        setLoading(true);
         const res = await api.get(
-            `/questions?page=${pagination.page}&limit=${pagination.limit}&filter=${filter}&sort=${sort}&search=${searchTerm}`
+          `/questions?page=${pagination.page}&limit=${pagination.limit}&filter=${filter}&sort=${sort}&search=${searchTerm}`
         );
+        
         if (res.data) {
           setQuestions(res.data.questions || []);
           setPagination({
@@ -91,14 +133,16 @@ const Forum = () => {
             total: res.data.total,
             totalPages: res.data.totalPages,
             limit: pagination.limit
-        });
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching questions:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error fetching questions:', err);
-    }
-    setLoading(false);
-  };
-  fetchQuestions();
+    };
+    
+    fetchQuestions();
   }, [searchTerm, filter, sort, pagination.page, refreshCounter]);
 
   const handleAsk = () => user ? navigate('/ask') : navigate('/login');
@@ -111,7 +155,6 @@ const Forum = () => {
   const confirmDelete = async () => {
     try {
       await api.delete(`/questions/${questionToDelete}`);
-      setQuestions(qs => qs.filter(q => q._id !== questionToDelete));
       setRefreshCounter(prev => prev + 1);
     } catch (err) {
       console.error(err);
@@ -120,46 +163,42 @@ const Forum = () => {
   };
 
   const handleLike = async (questionId) => {
-  try {
-    await api.post(`/questions/${questionId}/like`);
-
-    // Atnaujinti būseną
-
-    setQuestions(prev => prev.map(q => 
-      q._id === questionId ? { ...q, 
-        likes: (q.likes || 0) + 1, 
-        dislikes: q.userDisliked ? (q.dislikes || 0) - 1 : q.dislikes, // Pašalina "dislike" jei buvo
-        userLiked: true,
-        userDisliked: false } : q
-    ));
-    setRefreshCounter(prev => prev + 1);
-  } catch (err) {
-    console.error('Error liking question:', err);
-  }
-};
+    try {
+      await api.post(`/questions/${questionId}/like`);
+      setRefreshCounter(prev => prev + 1);
+    } catch (err) {
+      console.error('Error liking question:', err);
+    }
+  };
 
   const handleDislike = async (questionId) => {
-  try {
-    await api.post(`/questions/${questionId}/dislike`);
+    try {
+      await api.post(`/questions/${questionId}/dislike`);
+      setRefreshCounter(prev => prev + 1);
+    } catch (err) {
+      console.error('Error disliking question:', err);
+    }
+  };
 
-    // Atnaujinti būseną
+  const toggleAnswers = (questionId) => {
+    setExpandedAnswers(prev => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }));
+  };
 
-    setQuestions(prev => prev.map(q => 
-      q._id === questionId ? { ...q,
-        dislikes: (q.dislikes || 0) + 1, 
-        likes: q.userLiked ? (q.likes || 0) - 1 : q.likes, // Pašalina "like" jei buvo
-        userDisliked: true,
-        userLiked: false } : q
-    ));
-    setRefreshCounter(prev => prev + 1); 
-  } catch (err) {
-    console.error('Error disliking question:', err);
-  }
-};
-
-  const toggleAnswers = (id) => {
-    setExpandedQuestionId(expandedQuestionId === id ? null : id);
-};
+  const handleAnswerSubmit = async (questionId) => {
+    try {
+      await api.post(`/questions/${questionId}/answers`, {
+        content: answerContent
+      });
+      setAnswerContent('');
+      setActiveAnswerForm(null);
+      setRefreshCounter(prev => prev + 1);
+    } catch (err) {
+      console.error('Error posting answer:', err);
+    }
+  };
 
   return (
     <PageContainer>
@@ -174,57 +213,71 @@ const Forum = () => {
         <SearchBar onSearch={setSearchTerm} />
 
         <Filters>
-          <span style={{ color: '#00ff00' }}>Filter:</span>
-          {['All', 'Answered', 'Unanswered'].map(tag => (
+          <span>Filter:</span>
+          {['all', 'answered', 'unanswered'].map(f => (
             <FilterButton
-              key={tag}
-              $active={selectedTag === tag.toLowerCase()}
-              onClick={() => setSelectedTag(tag.toLowerCase())}
+              key={f}
+              $active={filter === f}
+              onClick={() => setFilter(f)}
             >
-              {tag.charAt(0).toUpperCase() + tag.slice(1)}
+              {f.charAt(0).toUpperCase() + f.slice(1)}
             </FilterButton>
           ))}
-          <span style={{ color: '#00ff00', marginLeft: 20 }}>Sort:</span>
-          {['Newest', 'Popular'].map(s => (
+
+          <span>Sort:</span>
+          {['newest', 'popular'].map(s => (
             <FilterButton
               key={s}
               $active={sort === s}
               onClick={() => setSort(s)}
             >
-              {s === 'Popular' ? 'Most Answered' : 'Newest'}
+              {s === 'popular' ? 'Most Answered' : 'Newest'}
             </FilterButton>
           ))}
         </Filters>
 
-        {loading && <div style={{ color: '#00ff00' }}>Loading questions...</div>}
+        {loading && <div style={{ color: '#00ff00', textAlign: 'center' }}>Loading questions...</div>}
+        
         {!loading && questions.length === 0 && (
           <div style={{ color: '#00ff00', textAlign: 'center' }}>No questions found</div>
-        )};
+        )}
 
         <QuestionsList>
-          {questions.map(q => (
-            <React.Fragment key={q._id}>
+          {questions.map(question => (
+            <React.Fragment key={question._id}>
               <QuestionCard
-                questionData={q}
-                isOwner={user && user.id === q.userId}
-                onDelete={() => handleDeleteClick(q._id)}
-                onEdit={() => navigate('/ask', { state: { questionToEdit: q } })}
-                onClick={() => toggleAnswers(q._id)}
-                onLike={() => handleLike(q._id)}
-                onDislike={() => handleDislike(q._id)}
+                questionData={question}
+                isOwner={user && user.id === question.userId}
+                onDelete={() => handleDeleteClick(question._id)}
+                onClick={() => toggleAnswers(question._id)}
+                onLike={() => handleLike(question._id)}
+                onDislike={() => handleDislike(question._id)}
+                onAnswer={() => setActiveAnswerForm(question._id)}
+                showAllAnswers={expandedAnswers[question._id]}
               />
               
-              {expandedQuestionId === q._id && (
-                <div className="expanded-answers" style={{ 
-                  background: '#111', 
-                  padding: '10px', 
-                  marginTop: '-10px',
-                  border: '1px solid #00ff00'
-                }}>
-                  {q.answers?.slice(3).map(answer => (
-                    <div key={answer._id} style={{ marginBottom: '10px' }}>
+              {activeAnswerForm === question._id && (
+                <AnswerFormContainer>
+                  <AnswerTextarea
+                    value={answerContent}
+                    onChange={(e) => setAnswerContent(e.target.value)}
+                    placeholder="Write your answer here..."
+                  />
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <Button onClick={() => handleAnswerSubmit(question._id)}>Submit</Button>
+                    <Button variant="danger" onClick={() => setActiveAnswerForm(null)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </AnswerFormContainer>
+              )}
+              
+              {expandedAnswers[question._id] && question.answers?.length > 3 && (
+                <ExpandedAnswersContainer>
+                  {question.answers.slice(3).map(answer => (
+                    <div key={answer._id} style={{ marginBottom: '15px' }}>
                       <div style={{ color: '#00ff00' }}>
-                        <strong>{answer.userName || 'User'}:</strong> {answer.answer}
+                        <strong>{answer.userName}:</strong> {answer.answer}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: '#666' }}>
                         {new Date(answer.createdAt).toLocaleDateString()}
@@ -232,37 +285,28 @@ const Forum = () => {
                       </div>
                     </div>
                   ))}
-                </div>
+                </ExpandedAnswersContainer>
               )}
             </React.Fragment>
           ))}
         </QuestionsList>
 
-        <Pagination>
-          <button disabled={pagination.page === 1} onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))}>
-            Previous
-          </button>
-          <span>
-            Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit) || 1}
-          </span>
-          <button
-            disabled={pagination.page * pagination.limit >= pagination.total}
-            onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))}
-          >
-            Next
-          </button>
-        </Pagination>
-      </ForumContainer>
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+        />
 
-      <Modal
-        isOpen={deleteModalOpen}
-        title="Confirm deletion"
-        message="Are you sure you want to delete this question? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        onConfirm={confirmDelete}
-        onClose={() => setDeleteModalOpen(false)}
-      />
+        <Modal
+          isOpen={deleteModalOpen}
+          title="Confirm deletion"
+          message="Are you sure you want to delete this question? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={confirmDelete}
+          onClose={() => setDeleteModalOpen(false)}
+        />
+      </ForumContainer>
     </PageContainer>
   );
 }
