@@ -50,7 +50,28 @@ export function UserProvider({ children }) {
     dispatch({ type: ACTIONS.UPDATE_USER, payload: userData });
   };
 
-  const resetLogoutTimer = () => startTimer();
+  const resetLogoutTimer = () => {
+    if (logoutTimer.current) clearTimeout(logoutTimer.current);
+    logoutTimer.current = setTimeout(() => handleLogout(), 5 * 60 * 1000); // 5 min
+  };
+
+   useEffect(() => {
+    const events = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
+    
+    const resetTimer = () => {
+      resetLogoutTimer();
+    };
+    
+    events.forEach(event => {
+      window.addEventListener(event, resetTimer);
+    });
+    
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, resetTimer);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('quantum_token');

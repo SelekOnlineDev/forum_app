@@ -91,12 +91,9 @@ const Forum = () => {
             totalPages: res.data.totalPages,
             limit: pagination.limit
         });
-      } else {
-        setQuestions([]);
       }
     } catch (err) {
       console.error('Error fetching questions:', err);
-      setQuestions([]);
     }
     setLoading(false);
   };
@@ -204,7 +201,7 @@ const Forum = () => {
             <QuestionCard
               key={q._id}
               id={q._id}
-              questionData={q.question}
+              questionData={q}
               description={q.description}
               answers={q.answers}
               answerCount={q.answerCount || 0}

@@ -63,7 +63,11 @@ const fixLikesDislikes = async () => {
 const app = express();
 const PORT = process.env.PORT || 5501;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ 
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'] 
+}));
 app.use(express.json());
 
 // Serverio diagnostika: Middleware, kuris logina kiekvieną užklausą

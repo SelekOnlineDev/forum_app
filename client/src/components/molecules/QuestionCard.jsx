@@ -56,12 +56,11 @@ const DeleteButton = styled(Button)`
 `;
 
 const QuestionCard = ({ questionData, onDelete, isOwner, onLike, onDislike }) => {
-  const isAnswered = questionData.answers?.length > 0 || false;
-  // const likes = question.likes || 0;
+  const isAnswered = questionData.answers?.length > 0;
 
   return (
     <Card>
-      <Title>{questionData.title}</Title>
+      <Title>{questionData.question}</Title>
 
       <LikeButton onClick={() => onLike(questionData._id)}>
         👍 {questionData.likes || 0}
