@@ -110,6 +110,18 @@ const Forum = () => {
   const [activeAnswerForm, setActiveAnswerForm] = useState(null);
   const [answerContent, setAnswerContent] = useState('');
 
+  // Atstatau puslapį į 1 kai pasikeičia filtras
+
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [filter]);
+
+  // Atstatau puslapį į 1 kai pasikeičia rūšiavimas
+
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [sort]);
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {

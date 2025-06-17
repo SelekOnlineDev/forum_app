@@ -103,9 +103,31 @@ export const getDb = async () => {
   return db;
 };
 
+const fixAnswerCounts = async () => {
+  try {
+    const db = await getDb();
+    const questions = await db.collection('questions').find({}).toArray();
+    
+    for (const q of questions) {
+      const answerCount = await db.collection('answers')
+        .countDocuments({ questionId: q._id });
+      
+      await db.collection('questions').updateOne(
+        { _id: q._id },
+        { $set: { answerCount } }
+      );
+    }
+    
+    console.log('Answer counts fixed!');
+  } catch (err) {
+    console.error('Error fixing answer counts:', err);
+  }
+};
+
 const startServer = async () => {
   try {
     await getDb(); // prisijungimas įvyksta prieš paleidžiant serverį
+    await fixAnswerCounts(); // Ištaisau atsakymų skaičių prieš paleidžiant serverį
     // await fixLikesDislikes(); // Ištaisau likes ir dislikes prieš paleidžiant serverį
 
     app.use('/api', userRoutes);

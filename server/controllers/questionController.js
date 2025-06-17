@@ -11,6 +11,8 @@ export const getAllQuestions = async (req, res) => {
     
     let query = {};
     
+    // Paieška
+
     if (search) {
       query.$or = [
         { question: { $regex: search, $options: 'i' } },
@@ -20,6 +22,9 @@ export const getAllQuestions = async (req, res) => {
     if (req.query.tag) {
       query.tags = req.query.tag;
     }
+
+    // Filtravimas
+
     if (filter === 'answered') {
       query.answerCount = { $gt: 0 };  // Tik atsakyti klausimai
     }   
@@ -27,9 +32,14 @@ export const getAllQuestions = async (req, res) => {
       query.answerCount = { $eq: 0 };  // Tik neatsakyti klausimai
     }
     
-    let sortOption = { createdAt: -1 };
+    // Rųšiavimas
+
+    let sortOption = { createdAt: -1 }; // Default: naujausi viršuje
     if (sort === 'popular') {
-      sortOption = { answerCount: -1 };
+      sortOption = { 
+        answerCount: -1, // Daugiausiai atsakymų viršuje
+        createdAt: -1    // Jei vienodas atsakymų sk. - naujesni viršuje
+      };
     }
     
     // Gaunu klausimus su vartotojų informacija
