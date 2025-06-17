@@ -3,14 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate  } from '
 import { UserProvider } from './context/UserContext';
 import { useUser } from './context/UserContext';
 import MainOutlet from './components/MainOutlet';
-import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Forum from './pages/Forum';
 import Ask from './pages/Ask';
 import User from './pages/User';
-import QuestionDetail from './pages/QuestionDetail'; 
 import TimeoutModal from './components/molecules/TimeoutModal';
 import styled from 'styled-components';
 
@@ -61,7 +59,7 @@ function AppContent() {
 
   return (
     <>
-      <AutoLogoutHandler>
+       <AutoLogoutHandler>
         <AppContainer>
           <Routes>
             <Route element={<MainOutlet />}>
@@ -69,7 +67,7 @@ function AppContent() {
               <Route path="/forum" element={<Forum />} />
               <Route path="/ask" element={<Ask />} />
               <Route path="/user" element={<User />} />
-              <Route path="/question/:id" element={<QuestionDetail />} />
+              {/* Pašalinamas klausimų detalės puslapis */}
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -91,11 +89,9 @@ function AppContent() {
 function App() {
   return (
     <UserProvider>
-      <ErrorBoundary>
         <Router>
           <AppContent />
         </Router>
-      </ErrorBoundary>
     </UserProvider>
   );
 }

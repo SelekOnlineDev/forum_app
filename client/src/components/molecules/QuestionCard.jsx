@@ -10,6 +10,7 @@ const Card = styled.div`
   position: relative;
   cursor: pointer;
   transition: all 0.3s;
+  margin-bottom: 20px;
   
   &:hover {
     transform: translateY(-3px);
@@ -41,15 +42,6 @@ const Meta = styled.div`
   margin-top: 10px;
 `;
 
-const Badge = styled.span`
-  background-color: ${({ $answered }) => $answered ? '#00ff00' : '#666666'};
-  color: #000;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: bold;
-`;
-
 const DeleteButton = styled(Button)`
   position: absolute;
   top: 15px;
@@ -66,46 +58,79 @@ const AnswerButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
+const Answer = styled.div`
+  margin-top: 10px;
+  padding: 10px;
+  border-top: 1px solid #333;
+`;
+
 const QuestionCard = ({ 
   questionData, 
   onDelete, 
   isOwner, 
   onLike, 
   onDislike,
-  onClick,
   onAnswer,
-  showAllAnswers
+  onShowMore,
+  expanded = false
 }) => {
-  const isAnswered = questionData.answerCount > 0;
-  const displayedAnswers = questionData.answers?.slice(0, 3) || [];
-  const shouldShowMore = questionData.answers?.length > 3 && !showAllAnswers;
+
+   // Visi atsakymai
+
+  const allAnswers = questionData.answers || [];
+  
+  // Pirmi 3 atsakymai
+
+  const firstThreeAnswers = allAnswers.slice(0, 3);
+  
+  // Papildomi atsakymai rodomi tik kai išskleista
+
+  const additionalAnswers = allAnswers.slice(3);
 
   return (
-    <Card onClick={onClick}>
+    <Card>
       <Title>{questionData.question}</Title>
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-        <LikeButton onClick={(e) => { e.stopPropagation(); onLike(); }}>
+        <LikeButton onClick={() => onLike(questionData._id)}>
           👍 {questionData.likes || 0}
         </LikeButton>
-        <LikeButton onClick={(e) => { e.stopPropagation(); onDislike(); }}>
+        <LikeButton onClick={() => onDislike(questionData._id)}>
           👎 {questionData.dislikes || 0}
         </LikeButton>
       </div>
 
-      {displayedAnswers.map((answer) => (
-        <div key={answer._id} style={{ marginTop: '10px', color: '#00ff00' }}>
+      {/* Rodau pirmus 3 atsakymus */}
+
+      {firstThreeAnswers.map((answer) => (
+        <Answer key={answer._id}>
           <div>
             <strong>{answer.userName || 'User'}:</strong> {answer.answer}
           </div>
-          <div style={{ fontSize: '0.8rem', color: '#666' }}>
+          <div style={{ fontSize: '0.8rem', color: '#666666' }}>
             {new Date(answer.createdAt).toLocaleDateString()}
             {answer.updatedAt && ' (edited)'}
           </div>
-        </div>
+        </Answer>
       ))}
 
-      {shouldShowMore && (
+      {/* Rodau papildomus atsakymus kai išskleista */}
+
+      {expanded && additionalAnswers.map((answer) => (
+        <Answer key={answer._id}>
+          <div>
+            <strong>{answer.userName || 'User'}:</strong> {answer.answer}
+          </div>
+          <div style={{ fontSize: '0.8rem', color: '#666666' }}>
+            {new Date(answer.createdAt).toLocaleDateString()}
+            {answer.updatedAt && ' (edited)'}
+          </div>
+        </Answer>
+      ))}
+
+      {/* Rodau "read more" tik jei yra daugiau nei 3 atsakymai ir nėra išskleista */}
+
+      {!expanded && allAnswers.length > 3 && (
         <div 
           style={{ 
             color: '#00ff00', 
@@ -113,12 +138,9 @@ const QuestionCard = ({
             cursor: 'pointer',
             textDecoration: 'underline'
           }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
+          onClick={() => onShowMore(questionData._id)}
         >
-          +{questionData.answers.length - 3} more answers
+          +{allAnswers.length - 3} more answers
         </div>
       )}
 
@@ -128,19 +150,13 @@ const QuestionCard = ({
           {new Date(questionData.createdAt).toLocaleDateString()}
           {questionData.updatedAt && ' (edited)'}
         </div>
-        <Badge $answered={isAnswered}>
-          {questionData.answerCount} {questionData.answerCount === 1 ? 'Answer' : 'Answers'}
-        </Badge>
       </Meta>
 
        {isOwner && (
         <DeleteButton
           variant="danger"
           size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
+          onClick={() => onDelete(questionData._id)}
         >
           Delete
         </DeleteButton>
@@ -148,10 +164,7 @@ const QuestionCard = ({
       
       <AnswerButton 
         size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          onAnswer();
-        }}
+        onClick={() => onAnswer(questionData._id)}
       >
         Answer
       </AnswerButton>

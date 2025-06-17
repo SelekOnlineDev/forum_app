@@ -89,14 +89,6 @@ const AnswerTextarea = styled.textarea`
   resize: vertical;
 `;
 
-const ExpandedAnswersContainer = styled.div`
-  padding: 15px;
-  border: 1px solid #00ff00;
-  background: #000;
-  margin-top: -20px;
-  margin-bottom: 20px;
-`;
-
 const Forum = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -114,7 +106,7 @@ const Forum = () => {
     totalPages: 1
   });
   const [refreshCounter, setRefreshCounter] = useState(0);
-  const [expandedAnswers, setExpandedAnswers] = useState({});
+  const [expandedQuestions, setExpandedQuestions] = useState({});
   const [activeAnswerForm, setActiveAnswerForm] = useState(null);
   const [answerContent, setAnswerContent] = useState('');
 
@@ -127,12 +119,7 @@ const Forum = () => {
         );
         
         if (res.data) {
-          const questionsWithAnswers = res.data.questions.map(question => ({
-            ...question,
-            answers: question.answers || []
-          }));
-          
-          setQuestions(questionsWithAnswers);
+          setQuestions(res.data.questions);
           setPagination({
             page: res.data.page,
             total: res.data.total,
@@ -157,7 +144,28 @@ const Forum = () => {
     setDeleteModalOpen(true);
   };
 
-  const confirmDelete = async () => {
+  // // Funkcija atsakymų išskleidimui
+
+  const toggleAnswers = (questionId) => {
+    setExpandedQuestions(prev => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }));
+  };
+
+  // // Funkcija atsakymo formos atidarymui
+
+  const handleAnswerClick = (questionId) => {
+    // Automatiškai išskleidžiu visus atsakymus
+    setExpandedQuestions(prev => ({
+      ...prev,
+      [questionId]: true
+    }));
+    // Atidarau atsakymo formą
+    setActiveAnswerForm(questionId);
+  };
+
+   const confirmDelete = async () => {
     try {
       await api.delete(`/questions/${questionToDelete}`);
       setRefreshCounter(prev => prev + 1);
@@ -183,13 +191,6 @@ const Forum = () => {
     } catch (err) {
       console.error('Error disliking question:', err);
     }
-  };
-
-  const toggleAnswers = (questionId) => {
-    setExpandedAnswers(prev => ({
-      ...prev,
-      [questionId]: !prev[questionId]
-    }));
   };
 
   const handleAnswerSubmit = async (questionId) => {
@@ -247,20 +248,22 @@ const Forum = () => {
           <div style={{ color: '#00ff00', textAlign: 'center' }}>No questions found</div>
         )}
 
-         <QuestionsList>
+          <QuestionsList>
           {questions.map(question => (
             <React.Fragment key={question._id}>
               <QuestionCard
                 questionData={question}
                 isOwner={user && user.id === question.userId}
-                onDelete={() => handleDeleteClick(question._id)}
-                onClick={() => toggleAnswers(question._id)}
-                onLike={() => handleLike(question._id)}
-                onDislike={() => handleDislike(question._id)}
-                onAnswer={() => setActiveAnswerForm(question._id)}
-                showAllAnswers={expandedAnswers[question._id]}
+                onDelete={handleDeleteClick}
+                onLike={handleLike}
+                onDislike={handleDislike}
+                onAnswer={handleAnswerClick}
+                onShowMore={toggleAnswers}
+                expanded={expandedQuestions[question._id]}
               />
               
+             {/* Rodsu atsakymo formą tik aktyviam klausimui */}
+
               {activeAnswerForm === question._id && (
                 <AnswerFormContainer>
                   <AnswerTextarea
@@ -276,35 +279,11 @@ const Forum = () => {
                   </div>
                 </AnswerFormContainer>
               )}
-              
-              {expandedAnswers[question._id] && question.answers?.length > 3 && (
-                <ExpandedAnswersContainer>
-                  {question.answers?.map(answer => (
-                    <div 
-                      key={answer._id} 
-                      style={{
-                        margin: '10px 0',
-                        padding: '10px',
-                        border: '1px solid #00ff00',
-                        backgroundColor: '#000'
-                      }}
-                    >
-                      <div style={{ color: '#00ff00' }}>
-                        <strong>{answer.userName}:</strong> {answer.answer}
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: '#666' }}>
-                        {new Date(answer.createdAt).toLocaleDateString()}
-                        {answer.updatedAt && ' (edited)'}
-                      </div>
-                    </div>
-                  ))}
-                </ExpandedAnswersContainer>
-              )}
             </React.Fragment>
           ))}
         </QuestionsList>
 
-        <Pagination
+          <Pagination
           currentPage={pagination.page}
           totalPages={pagination.totalPages}
           onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
