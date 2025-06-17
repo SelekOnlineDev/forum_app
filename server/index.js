@@ -13,52 +13,57 @@ if (!process.env.JWT_SECRET) {
   process.exit(1);
 };
 
-const fixLikesDislikes = async () => {
-  try {
-    const db = await getDb();
-    const questions = db.collection('questions');
+// const fixLikesDislikes = async () => {
+//   try {
+//     const db = await getDb();
     
-    // Atnaujinu visus dokumentus, kur "likes" yra masyvas
-
-    await questions.updateMany(
-      { likes: { $type: 'array' } },
-      [{ 
-        $set: { 
-          likes: { 
-            $cond: {
-              if: { $gt: [{ $size: "$likes" }, 0] },
-              then: { $arrayElemAt: ["$likes", 0] },
-              else: 0
-            }
-          } 
-        }
-      }]
-    );
+//     // Pridėudu trūkstamus laukus naujiems klausimams
     
-    // Atnaujinu visus dokumentus, kur "dislikes" yra masyvas
+//     await db.collection('questions').updateMany(
+//       { 
+//         $or: [
+//           { likes: { $exists: false } },
+//           { dislikes: { $exists: false } },
+//           { likedBy: { $exists: false } },
+//           { dislikedBy: { $exists: false } }
+//         ]
+//       },
+//       { 
+//         $set: { 
+//           likes: 0,
+//           dislikes: 0,
+//           likedBy: [],
+//           dislikedBy: [] 
+//         } 
+//       }
+//     );
 
-    await questions.updateMany(
-      { dislikes: { $type: 'array' } },
-      [{ 
-        $set: { 
-          dislikes: { 
-            $cond: {
-              if: { $gt: [{ $size: "$dislikes" }, 0] },
-              then: { $arrayElemAt: ["$dislikes", 0] },
-              else: 0
-            }
-          } 
-        }
-      }]
-    );
-    
-    console.log('Likes and dislikes fixed successfully');
-  } catch (err) {
-    console.error('Error fixing likes and dislikes:', err);
-  }
-};
+//     const questionsToFix = await db.collection('questions').find({
+//       $or: [
+//         { likes: { $type: 'array' } },
+//         { dislikes: { $type: 'array' } }
+//       ]
+//     }).toArray();
 
-// Iškviečiu funkciją fixLikesDislikes() prieš serverio paleidimą
+//     for (const question of questionsToFix) {
+//       await db.collection('questions').updateOne(
+//         { _id: question._id },
+//         { 
+//           $set: { 
+//             likes: Array.isArray(question.likes) ? question.likes.length : question.likes,
+//             dislikes: Array.isArray(question.dislikes) ? question.dislikes.length : question.dislikes
+//           } 
+//         }
+//       );
+//     }
+
+//     console.log('Likes and dislikes fixed successfully');
+//   } catch (err) {
+//     console.error('Error fixing likes and dislikes:', err);
+//   }
+// };
+
+// // Iškviečiu funkciją fixLikesDislikes() prieš serverio paleidimą
 
 const app = express();
 const PORT = process.env.PORT || 5501;
@@ -101,6 +106,7 @@ export const getDb = async () => {
 const startServer = async () => {
   try {
     await getDb(); // prisijungimas įvyksta prieš paleidžiant serverį
+    // await fixLikesDislikes(); // Ištaisau likes ir dislikes prieš paleidžiant serverį
 
     app.use('/api', userRoutes);
     app.use('/api', questionRoutes);

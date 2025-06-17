@@ -16,7 +16,11 @@ export const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('Decoded token:', decoded); // paslėpti
-    req.user = { id: decoded.id };
+    req.user = { 
+      id: decoded.id, 
+      name: decoded.name,
+      email: decoded.email
+    };
     next();
   } catch (err) {
     console.error('Token verification failed:', err); // paslėpti

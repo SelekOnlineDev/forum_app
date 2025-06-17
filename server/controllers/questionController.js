@@ -2,11 +2,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { getDb } from '../index.js';
 
 export const getAllQuestions = async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 3;  // 3 klausimai per puslapį
-    const skip = (page - 1) * limit;
-  try {
+    try {
     const db = await getDb();
+    const page = parseInt(req.query.page) || 1;
+    const limit = 3;
+    const skip = (page - 1) * limit;
     const { search, filter, sort } = req.query;
     
     let query = {};
@@ -91,6 +91,8 @@ export const getAllQuestions = async (req, res) => {
       
       question.answers = answers;
     }
+      
+    // Atsakymų kiekis kiekvienam klausimui
 
     res.status(200).json({
       questions, 
@@ -111,7 +113,12 @@ export const createQuestion = async (req, res) => {
       _id: uuidv4(),
       userId: req.user.id, // Naudoju prisijungusio vartotojo ID
       question: req.body.question,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      likes: 0,
+      dislikes: 0,
+      likedBy: [],
+      dislikedBy: [],
+      answerCount: 0
     };
     if (!req.body.question || req.body.question.length < 4) {
       return res.status(400).json({ message: 'Question too short' });
@@ -211,22 +218,21 @@ export const likeQuestion = async (req, res) => {
     const hasLiked = question.likedBy?.includes(userId);
     const hasDisliked = question.dislikedBy?.includes(userId);
 
+    let update = {};
+
     if (hasLiked) {
 
-      // Pašalinti like
+      // Pašalinu like
 
-      await db.collection('questions').updateOne(
-        { _id: id },
-        { 
-          $inc: { likes: -1 },
-          $pull: { likedBy: userId }
-        }
-      );
+      update = {
+        $inc: { likes: -1 },
+        $pull: { likedBy: userId }
+      };
     } else {
 
-      // Pridėti like
+      // Pridedu like
 
-      const update = { 
+      update = {
         $inc: { likes: 1 },
         $addToSet: { likedBy: userId }
       };
@@ -237,13 +243,17 @@ export const likeQuestion = async (req, res) => {
         update.$inc.dislikes = -1;
         update.$pull = { dislikedBy: userId };
       }
-      
-      await db.collection('questions').updateOne(
-        { _id: id },
-        update
-      );
     }
-    
+
+    const result = await db.collection('questions').updateOne(
+      { _id: id },
+      update
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ message: 'Update failed' });
+    }
+
     res.status(200).json({ message: 'Like updated' });
   } catch (err) {
     console.error('Error liking question:', err);
@@ -270,39 +280,42 @@ export const dislikeQuestion = async (req, res) => {
     const hasDisliked = question.dislikedBy?.includes(userId);
     const hasLiked = question.likedBy?.includes(userId);
 
-    if (hasLiked) {
+     let update = {};
 
-      // Pašalinti dislike
+    if (hasDisliked) {
 
-      await db.collection('questions').updateOne(
-        { _id: id },
-        { 
-          $inc: { dislikes: -1 },
-          $pull: { dislikedBy: userId }
-        }
-      );
+      // Pašalinu dislike
+
+      update = {
+        $inc: { dislikes: -1 },
+        $pull: { dislikedBy: userId }
+      };
     } else {
 
-      // Pridėti dislike
+      // Pridedu dislike
 
-      const update = { 
+      update = {
         $inc: { dislikes: 1 },
         $addToSet: { dislikedBy: userId }
       };
       
-      // Pašalinti like jei buvo
-
+      // Pašalinu like jei buvo
+      
       if (hasLiked) {
         update.$inc.likes = -1;
         update.$pull = { likedBy: userId };
       }
-      
-      await db.collection('questions').updateOne(
-        { _id: id },
-        update
-      );
     }
-    
+
+    const result = await db.collection('questions').updateOne(
+      { _id: id },
+      update
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ message: 'Update failed' });
+    }
+
     res.status(200).json({ message: 'Dislike updated' });
   } catch (err) {
     console.error('Error disliking question:', err);

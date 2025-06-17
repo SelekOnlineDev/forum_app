@@ -82,29 +82,34 @@ export function UserProvider({ children }) {
     };
   }, [resetLogoutTimer]);
 
+  const initializeUserFromToken = (token) => {
+    try {
+      const decoded = jwt_decode(token);
+      return {
+        id: decoded.id,
+        name: decoded.name,
+        email: decoded.email
+      };
+    } catch (err) {
+      console.error('Token decode error:', err);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('quantum_token');
     
-    if (!token) {
-      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-      return;
+    if (token) {
+    const userData = initializeUserFromToken(token);
+    if (userData) {
+      dispatch({ type: ACTIONS.LOGIN, payload: userData });
+    } else {
+      localStorage.removeItem('quantum_token');
     }
-    
-    try {
-      const decoded = jwt_decode(token);
-      const expirationTime = decoded.exp * 1000;
-      
-      if (Date.now() > expirationTime) {
-        handleLogout();
-      } else {
-        const timeUntilExpiration = expirationTime - Date.now();
-        logoutTimer.current = setTimeout(handleLogout, timeUntilExpiration);
-      }
-    } catch (err) {
-      console.error('Token decode error:', err);
-      handleLogout();
-    }
-  }, []);
+  } else {
+    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+  }
+}, []);
 
   return (
     <UserContext.Provider

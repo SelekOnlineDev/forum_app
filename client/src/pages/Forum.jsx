@@ -274,16 +274,18 @@ const Forum = () => {
               
               {expandedAnswers[question._id] && question.answers?.length > 3 && (
                 <ExpandedAnswersContainer>
-                  {question.answers.slice(3).map(answer => (
-                    <div key={answer._id} style={{ marginBottom: '15px' }}>
-                      <div style={{ color: '#00ff00' }}>
-                        <strong>{answer.userName}:</strong> {answer.answer}
+                  {question.answers?.map((answer, idx) => (
+                    idx < 3 || expandedAnswers[question._id] ? (
+                      <div key={answer._id} style={{ marginTop: '10px', color: '#00ff00' }}>
+                        <div>
+                          <strong>{answer.userName || 'User'}:</strong> {answer.answer}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                          {new Date(answer.createdAt).toLocaleDateString()}
+                          {answer.updatedAt && ' (edited)'}
+                        </div>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#666' }}>
-                        {new Date(answer.createdAt).toLocaleDateString()}
-                        {answer.updatedAt && ' (edited)'}
-                      </div>
-                    </div>
+                    ) : null
                   ))}
                 </ExpandedAnswersContainer>
               )}
