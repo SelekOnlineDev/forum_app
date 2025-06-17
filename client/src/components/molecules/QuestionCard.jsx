@@ -133,7 +133,7 @@ const QuestionCard = ({
         </Badge>
       </Meta>
 
-      {isOwner && (
+       {isOwner && (
         <DeleteButton
           variant="danger"
           size="small"

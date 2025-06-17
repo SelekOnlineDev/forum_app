@@ -127,7 +127,12 @@ const Forum = () => {
         );
         
         if (res.data) {
-          setQuestions(res.data.questions || []);
+          const questionsWithAnswers = res.data.questions.map(question => ({
+            ...question,
+            answers: question.answers || []
+          }));
+          
+          setQuestions(questionsWithAnswers);
           setPagination({
             page: res.data.page,
             total: res.data.total,
@@ -242,7 +247,7 @@ const Forum = () => {
           <div style={{ color: '#00ff00', textAlign: 'center' }}>No questions found</div>
         )}
 
-        <QuestionsList>
+         <QuestionsList>
           {questions.map(question => (
             <React.Fragment key={question._id}>
               <QuestionCard
@@ -274,18 +279,24 @@ const Forum = () => {
               
               {expandedAnswers[question._id] && question.answers?.length > 3 && (
                 <ExpandedAnswersContainer>
-                  {question.answers?.map((answer, idx) => (
-                    idx < 3 || expandedAnswers[question._id] ? (
-                      <div key={answer._id} style={{ marginTop: '10px', color: '#00ff00' }}>
-                        <div>
-                          <strong>{answer.userName || 'User'}:</strong> {answer.answer}
-                        </div>
-                        <div style={{ fontSize: '0.8rem', color: '#666' }}>
-                          {new Date(answer.createdAt).toLocaleDateString()}
-                          {answer.updatedAt && ' (edited)'}
-                        </div>
+                  {question.answers?.map(answer => (
+                    <div 
+                      key={answer._id} 
+                      style={{
+                        margin: '10px 0',
+                        padding: '10px',
+                        border: '1px solid #00ff00',
+                        backgroundColor: '#000'
+                      }}
+                    >
+                      <div style={{ color: '#00ff00' }}>
+                        <strong>{answer.userName}:</strong> {answer.answer}
                       </div>
-                    ) : null
+                      <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                        {new Date(answer.createdAt).toLocaleDateString()}
+                        {answer.updatedAt && ' (edited)'}
+                      </div>
+                    </div>
                   ))}
                 </ExpandedAnswersContainer>
               )}

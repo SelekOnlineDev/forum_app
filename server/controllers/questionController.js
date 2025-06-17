@@ -29,7 +29,7 @@ export const getAllQuestions = async (req, res) => {
     
     let sortOption = { createdAt: -1 };
     if (sort === 'popular') {
-      sortOption = { likes: -1 };
+      sortOption = { answerCount: -1 };
     }
     
     // Gaunu klausimus su vartotojų informacija
@@ -44,6 +44,10 @@ export const getAllQuestions = async (req, res) => {
         }
       },
       { $unwind: "$user" },
+      { $match: query },
+      { $sort: sortOption },
+      { $skip: skip },
+      { $limit: limit },
       {
         $project: {
           _id: 1,
@@ -53,20 +57,18 @@ export const getAllQuestions = async (req, res) => {
           likes: 1,
           dislikes: 1,
           answerCount: 1,
-          userName: "$user.name"
+          userName: "$user.name",
+          userId: 1
         }
-      },
-      { $match: query },
-      { $sort: sortOption },
-      { $skip: skip },
-      { $limit: limit }
+      }
     ]).toArray();
+
 
     const total = await db.collection('questions').countDocuments(query);
       
     // Gaunu atsakymus kiekvienam klausimui
 
-    for (const question of questions) {
+     for (const question of questions) {
       const answers = await db.collection('answers').aggregate([
         {
           $lookup: {
@@ -77,16 +79,17 @@ export const getAllQuestions = async (req, res) => {
           }
         },
         { $unwind: "$user" },
+        { $match: { questionId: question._id } },
         {
           $project: {
             _id: 1,
             answer: 1,
             createdAt: 1,
             updatedAt: 1,
-            userName: "$user.name"
+            userName: "$user.name",
+            userId: 1
           }
-        },
-        { $match: { questionId: question._id } }
+        }
       ]).toArray();
       
       question.answers = answers;
