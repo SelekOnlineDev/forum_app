@@ -3,19 +3,24 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { getDb } from '../index.js';
 
+
+// Registracijos funkcija, kuria sukuriu naują vartotoją
+
 export const registerUser = async (req, res) => {
   try {
-    const db = await getDb();
-    const users = db.collection('users');
-    const { name, email, password } = req.body;
+    const db = await getDb(); // Gaunu duomenų bazę
+    const users = db.collection('users'); // Pasirinkiu vartotojų kolekciją
+    const { name, email, password } = req.body; // Išskleidžiu duomenis iš užklausos kūno
 
-    const existing = await users.findOne({ email });
+    const existing = await users.findOne({ email }); // Patikrinu, ar vartotojas su tokiu el. paštu jau egzistuoja
     if (existing) {
       console.log('User already exists:', email);
     return res.status(400).json({ message: 'User already exists' });
     };
 
-    const hashed = await bcrypt.hash(password, 10);
+    // Šifruoju slaptažodį, kad jis būtų saugus
+    
+    const hashed = await bcrypt.hash(password, 10); 
     const newUser = {
       _id: uuidv4(),
       name,
@@ -24,7 +29,9 @@ export const registerUser = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-     await users.insertOne(newUser);
+     await users.insertOne(newUser); // Įterpiu naują vartotoją į duomenų bazę
+
+     // Sukuriu JWT token, kuris bus naudojamas vartotojo autentifikacijai
 
      const token = jwt.sign(
       { id: newUser._id, name: newUser.name, email: newUser.email },
@@ -46,6 +53,8 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Prisijungimo funkcija, kuria leidžiu vartotojui prisijungti su el. paštu ir slaptažodžiu
 
 export const loginUser = async (req, res) => {
   try {
@@ -69,7 +78,8 @@ export const loginUser = async (req, res) => {
      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    
+    // Sukuriu JWT token, jei vartotojas rastas ir slaptažodis teisingas
+
     const token = jwt.sign ({ id: user._id, name: user.name, email: user.email }, 
     process.env.JWT_SECRET, { expiresIn: '7d' });
     console.log('Login successful for user:', email);
@@ -80,17 +90,21 @@ export const loginUser = async (req, res) => {
   }
 };
 
+// Atnaujinu vartotojo profilį, leidžiu keisti vardą ir el. paštą
+
 export const updateProfile = async (req, res) => {
   try {
-    const db = await getDb();
-    const users = db.collection('users');
-    const { name, email } = req.body;
-    const userId = req.user.id;
+    const db = await getDb(); // Sukuriu DB objektą
+    const users = db.collection('users'); // Pasirinkiu vartotojų kolekciją
+    const { name, email } = req.body; // Gaunu vartotojo duomenis iš requesto
+    const userId = req.user.id; // Išgaunu vartotojo ID iš autentifikacijos informacijos
 
     // Patikrinu ar email jau naudojamas ar ne
 
     const existing = await users.findOne({ email, _id: { $ne: userId } });
     if (existing) return res.status(400).json({ message: 'Email already in use' });
+
+    // Atlieku vartotojo duomenų atnaujinimą
 
     const result = await users.updateOne(
       { _id: userId },
@@ -100,6 +114,8 @@ export const updateProfile = async (req, res) => {
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Patikrinu, ar atnaujinimas įvyko
 
     const updatedUser = await users.findOne({ _id: userId });
     res.status(200).json({
@@ -119,11 +135,10 @@ export const updateProfile = async (req, res) => {
 
 export const updatePassword = async (req, res) => {
   try {
-    const db = await getDb();
-    const users = db.collection('users');
-    const { currentPassword, newPassword } = req.body;
-    const userId = req.user.id;
-
+    const db = await getDb(); // Sukuriu DB objektą
+    const users = db.collection('users'); // Pasirinkiu vartotojų kolekciją
+    const { currentPassword, newPassword } = req.body; // Išskleidžiu slaptažodžius iš užklausos kūno
+    const userId = req.user.id; // Išgaunu vartotojo ID iš autentifikacijos informacijos
     console.log(`Password update attempt for user: ${userId}`);
 
     // Randu vartotoją
@@ -133,38 +148,36 @@ export const updatePassword = async (req, res) => {
       console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
-
     console.log('User found:', user.email);
-
-    // Tikrinu slaptažodį
-
     console.log('Comparing passwords...');
+
+    // Palyginu dabartinį slaptažodį su saugomu slaptažodžiu
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     
     if (!isMatch) {
       console.log('Password comparison failed');
       return res.status(401).json({ message: 'Invalid current password' });
     }
-
     console.log('Password matched, hashing new password...');
 
     // Šifruoju naują slaptažodį
 
-    const hashed = await bcrypt.hash(newPassword, 10);
-    
+    const hashed = await bcrypt.hash(newPassword, 10); 
     console.log('Updating password in database...');
+
+    // Atlieku slaptažodžio atnaujinimą duomenų bazėje
+
     const result = await users.updateOne(
       { _id: userId },
       { $set: { password: hashed } }
     );
-
     console.log('Update result:', result);
 
     if (result.modifiedCount === 0) {
       console.log('No documents modified');
       return res.status(500).json({ message: 'Password not updated' });
     }
-
     console.log('Password updated successfully');
     res.status(200).json({ message: 'Password updated' });
   } catch (err) {

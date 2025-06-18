@@ -30,6 +30,7 @@ const PasswordField = ({
   showPassword, 
   setShowPassword,
   placeholder 
+  
 }) => {
   return (
     <PasswordWrapper>

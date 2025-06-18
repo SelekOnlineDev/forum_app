@@ -32,6 +32,8 @@ const Copyright = styled.p`
   margin: 0;
 `;
 
+// Puslapio apačios komponentas, skirtas socialinių tinklų nuorodoms ir autorių teisių informacijai rodyti
+
 const Footer = () => {
   return (
     <FooterContainer>

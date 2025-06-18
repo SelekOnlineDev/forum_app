@@ -1,13 +1,18 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef, useState } from 'react';
 import jwt_decode from 'jwt-decode';
 
-const initialState = { user: null, loading: true };
+
+const initialState = { user: null, loading: true }; // Pradinė vartotojo konteksto būsena
+
+// Apibrėžiu reducer veiksmų tipus
+
 const ACTIONS = {
   LOGIN: 'LOGIN',
   LOGOUT: 'LOGOUT',
   SET_LOADING: 'SET_LOADING'
 };
 
+// Reducer, kuris tvarko vartotojo būsenos atnaujinimus
 
 function reducer(state, action) {
   switch (action.type) {
@@ -24,7 +29,7 @@ function reducer(state, action) {
   }
 }
 
-const UserContext = createContext();
+const UserContext = createContext(); // Sukuriu vartotojo konteksto objektą
 
 export function UserProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -32,16 +37,25 @@ export function UserProvider({ children }) {
   const logoutTimer = useRef(null);
   const [redirectAfterLogout, setRedirectAfterLogout] = useState(false);
 
+  // Funkcija, kuri pradeda atsijungimo laikmatį
+  // Jei vartotojas neaktyvus 5 minutes, jis bus atsijungtas
+
   const startTimer = () => {
     if (logoutTimer.current) clearTimeout(logoutTimer.current);
     logoutTimer.current = setTimeout(() => handleLogout(), 5 * 60 * 1000);
   };
+
+  // Funkcija, kuri tvarko vartotojo prisijungimą
+  // Išsaugo tokeną ir vartotojo duomenis localStorage ir atnaujina būseną
 
   const handleLogin = (token, userData) => {
     localStorage.setItem('quantum_token', token);
     dispatch({ type: ACTIONS.LOGIN, payload: userData });
     startTimer();
   };
+
+  // Funkcija, kuri tvarko vartotojo atsijungimą
+  // Išsaugo tokeną ir vartotojo duomenis localStorage ir atnaujina būseną
 
   const handleLogout = () => {
     localStorage.removeItem('quantum_token');
@@ -51,14 +65,21 @@ export function UserProvider({ children }) {
     setRedirectAfterLogout(true);
   };
 
+  // Funkcija, kuri uždaro modalą, kuris rodomas po atsijungimo dėl neaktyvumo
+
   const closeTimeoutModal = () => {
     setShowTimeoutModal(false);
   };
+
+  // Funkcija, kuri atnaujina vartotojo duomenis
+  // Tai gali būti naudinga, jei vartotojas atnaujina savo profilį
 
   const updateUser = (userData) => {
     dispatch({ type: ACTIONS.UPDATE_USER, payload: userData });
   };
 
+  // Funkcija, kuri atnaujina atsijungimo laikmatį
+  
   const resetLogoutTimer = () => {
     if (logoutTimer.current) clearTimeout(logoutTimer.current);
     logoutTimer.current = setTimeout(() => handleLogout(), 5 * 60 * 1000); // 5 min
@@ -82,6 +103,8 @@ export function UserProvider({ children }) {
     };
   }, [resetLogoutTimer]);
 
+  // Funkcija, kuri iš pradžių inicijuoja vartotojo duomenis iš tokeno 
+
   const initializeUserFromToken = (token) => {
     try {
       const decoded = jwt_decode(token);
@@ -97,7 +120,7 @@ export function UserProvider({ children }) {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('quantum_token');
+    const token = localStorage.getItem('quantum_token'); // Paimu tokeną iš localStorage
     
     if (token) {
     const userData = initializeUserFromToken(token);
@@ -131,6 +154,9 @@ export function UserProvider({ children }) {
   );
 }
 
+// Hook, kuris leidžia naudoti vartotojo kontekstą bet kurioje komponentėje
+// Tai leidžia lengvai pasiekti vartotojo duomenis ir funkcijas
+
 export function useUser() {
   const ctx = useContext(UserContext);
   if (!ctx) throw new Error('useUser used outside UserProvider');
@@ -142,6 +168,8 @@ export function useUser() {
   };
 }
 
+// Komponentas, kuris tvarko automatinį atsijungimą po 5 minučių neaktyvumo
+
 export const AutoLogoutHandler = ({ children }) => {
   const { resetLogoutTimer, logout } = useUser();
 
@@ -149,6 +177,9 @@ export const AutoLogoutHandler = ({ children }) => {
     const events = ['mousemove', 'keydown', 'mousedown', 'touchstart'];
     let timeoutId;
 
+    // Funkcija, kuri pradeda atsijungimo laikmatį
+    // Jei vartotojas neaktyvus 5 minutes, jis bus atsijungtas
+    
     const startTimer = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {

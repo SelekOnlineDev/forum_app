@@ -7,9 +7,9 @@ import {
 } from '../controllers/answerController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const router = express.Router(); // Sukuriu naują Express maršrutizatorių
 
-router.get('/questions/:id/answers', getAnswersByQuestionId);
+router.get('/questions/:id/answers', getAnswersByQuestionId); 
 router.post('/questions/:id/answers', authMiddleware, createAnswer);
 router.patch('/answers/:id', authMiddleware, updateAnswer);
 router.delete('/answers/:id', authMiddleware, deleteAnswer);

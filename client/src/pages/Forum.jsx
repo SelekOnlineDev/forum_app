@@ -1,12 +1,12 @@
 import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import QuestionCard from '../components/molecules/QuestionCard';
-import SearchBar from '../components/atoms/SearchBar';
+import QuestionCard from '../components/organisms/QuestionCard';
+import SearchBar from '../components/molecules/SearchBar';
 import Button from '../components/atoms/Button';
 import Modal from '../components/molecules/Modal';
 import Pagination from '../components/molecules/Pagination';
-import LoadingSpinner from '../components/atoms/LoadingSpinner';
+import LoadingSpinner from '../components/molecules/LoadingSpinner';
 import Alert from '../components/molecules/Alert';
 import styled from 'styled-components';
 import api from '../services/api';

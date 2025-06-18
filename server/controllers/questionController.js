@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid'
 import { getDb } from '../index.js';
 
+// Gaunu visus klausimus su vartotojų informacija, puslapiavimas, paieška, filtravimas ir rųšiavimas
+
 export const getAllQuestions = async (req, res) => {
     try {
     const db = await getDb();
@@ -43,6 +45,7 @@ export const getAllQuestions = async (req, res) => {
     }
     
     // Gaunu klausimus su vartotojų informacija
+    // Naudoju MongoDB agregaciją su $lookup, kad prijungčiau vartotojų informaciją
 
     const questions = await db.collection('questions').aggregate([
       {
@@ -73,13 +76,14 @@ export const getAllQuestions = async (req, res) => {
       }
     ]).toArray();
 
+    // Skaičiuoju bendrą klausimų kiekį pagal užklausą
 
-    const total = await db.collection('questions').countDocuments(query);
+    const total = await db.collection('questions').countDocuments(query);  
       
-    // Gaunu atsakymus kiekvienam klausimui
+    // Pridedu atsakymus prie kiekvieno klausimo
 
      for (const question of questions) {
-      const answers = await db.collection('answers').aggregate([
+      const answers = await db.collection('answers').aggregate([ 
         {
           $lookup: {
             from: "users",
@@ -105,7 +109,7 @@ export const getAllQuestions = async (req, res) => {
       question.answers = answers;
     }
       
-    // Atsakymų kiekis kiekvienam klausimui
+    // Grąžinu klausimus su puslapiavimu ir bendru skaičiumi
 
     res.status(200).json({
       questions, 
@@ -118,6 +122,8 @@ export const getAllQuestions = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Sukuriu naują klausimą
 
 export const createQuestion = async (req, res) => {
   try {
@@ -136,7 +142,7 @@ export const createQuestion = async (req, res) => {
     if (!req.body.question || req.body.question.length < 4) {
       return res.status(400).json({ message: 'Question too short' });
 }
-    const result = await db.collection('questions').insertOne(newQuestion);
+    const result = await db.collection('questions').insertOne(newQuestion); // Įterpiu naują klausimą į duomenų bazę
     res.status(201).json({ message: 'Question created',question: newQuestion, id: result.insertedId });
   } catch (err) {
     console.error('Error creating question:', err);
@@ -144,14 +150,16 @@ export const createQuestion = async (req, res) => {
   }
 };
 
+// Gaunu klausimą pagal ID su atsakymais
+
 export const getQuestionById = async (req, res) => {
   try {
     const db = await getDb();
-    const question = await db.collection('questions').findOne({ _id: req.params.id });
+    const question = await db.collection('questions').findOne({ _id: req.params.id }); // Gaunu klausimą pagal ID
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     } 
-    // Pridedu atsakymus prie klausimo
+    // Pridedu vartotojo informaciją, kad būtų galima matyti, kas sukūrė klausimą
     
     const answers = await db.collection('answers')
       .find({ questionId: req.params.id })
@@ -163,6 +171,9 @@ export const getQuestionById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Ištrinu klausimą pagal ID ir visus su juo susijusius atsakymus
+// Prieš ištrindamas klausimą, taip pat ištrinu visus ats
 
 export const deleteQuestion = async (req, res) => {
   try {
@@ -179,6 +190,8 @@ export const deleteQuestion = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Atnaujinu klausimą pagal ID, pridedu savininko patikrinimą
 
 export const updateQuestion = async (req, res) => {
   try {
@@ -212,15 +225,17 @@ export const updateQuestion = async (req, res) => {
   }
 };
 
+// Pridedu like ir dislike funkcionalumą klausimams
+
 export const likeQuestion = async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params;
     const userId = req.user.id;
     
-    // Pirmiausia gauti klausimą
+    // Pirmiausia gaunu klausimą
 
-    const question = await db.collection('questions').findOne({ _id: id });
+    const question = await db.collection('questions').findOne({ _id: id }); // Naudoju ID, kuris yra unikalus klausimo identifikatorius
     
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
@@ -258,6 +273,8 @@ export const likeQuestion = async (req, res) => {
       }
     }
 
+    // Atnaujinu klausimą su like/dislike
+
     const result = await db.collection('questions').updateOne(
       { _id: id },
       update
@@ -274,6 +291,8 @@ export const likeQuestion = async (req, res) => {
   }
 };
 
+// Išskleidžiu dislike funkcionalumą klausimams
+
 export const dislikeQuestion = async (req, res) => {
   try {
     const db = await getDb();
@@ -288,7 +307,7 @@ export const dislikeQuestion = async (req, res) => {
       return res.status(404).json({ message: 'Question not found' });
     }
     
-     // Patikrinti ar vartotojas jau "dislike"
+     // Patikrinti ar vartotojas jau "like" ar "dislike"
 
     const hasDisliked = question.dislikedBy?.includes(userId);
     const hasLiked = question.likedBy?.includes(userId);
@@ -319,6 +338,8 @@ export const dislikeQuestion = async (req, res) => {
         update.$pull = { likedBy: userId };
       }
     }
+
+    // Atnaujinu klausimą su like/dislike
 
     const result = await db.collection('questions').updateOne(
       { _id: id },

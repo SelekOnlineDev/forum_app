@@ -15,7 +15,7 @@ import {
 } from '../controllers/answerController.js';
 
 
-const router = express.Router();
+const router = express.Router(); // Sukuriu naują Express maršrutizatorių
 
 router.get('/questions', getAllQuestions);
 router.post('/questions', authMiddleware, createQuestion);

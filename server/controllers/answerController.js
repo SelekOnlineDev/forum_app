@@ -1,11 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../index.js';
+import { getDb } from '../index.js'; 
+
+// Gaunu visus atsakymus pagal klausimo ID
 
 export const getAnswersByQuestionId = async (req, res) => {
   try {
-    const db = await getDb();
+    const db = await getDb(); 
     const { id } = req.params;
-    const result = await db.collection('answers').find({ questionId: id }).toArray();
+    const result = await db.collection('answers').find({ questionId: id }).toArray(); 
     res.status(200).json(result);
   } catch (err) {
     console.error('Error fetching answers:', err);
@@ -13,24 +15,30 @@ export const getAnswersByQuestionId = async (req, res) => {
   }
 };
 
+// Sukuriu naują atsakymą į klausimąs
+
 export const createAnswer = async (req, res) => {
   try {
     const db = await getDb();
     const { id } = req.params;
     const { content } = req.body;
 
+    // Patikrinu, ar klausimas egzistuoja
+
     const newAnswer = {
        _id: uuidv4(),
-      questionId: id,
-      answer: content,
+      questionId: id, // Klausimo ID, į kurį atsakoma
+      answer: content, // Atsakymo turinys
       userId: req.user.id, // Prisijungusio vartotojo ID
       createdAt: new Date().toISOString(),
     };
 
+    // Patikrinimas, ar vartotojas yra prisijungęs
+    
     await db.collection('answers').insertOne(newAnswer);
     await db.collection('questions').updateOne(
-      { _id: id },
-      { $inc: { answerCount: 1 } }
+      { _id: id }, 
+      { $inc: { answerCount: 1 } } 
     );
     res.status(201).json({ message: 'Answer created' });
   } catch (err) {
@@ -38,6 +46,8 @@ export const createAnswer = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Atnaujinu atsakymą pagal ID
 
 export const updateAnswer = async (req, res) => {
   try {
@@ -47,7 +57,7 @@ export const updateAnswer = async (req, res) => {
 
     // Pridedu savininko patikrinimą
     
-    const answer = await db.collection('answers').findOne({ _id: id });
+    const answer = await db.collection('answers').findOne({ _id: id }); // Patikrinimas, ar atsakymas egzistuoja
 
     if (!answer) {
       return res.status(404).json({ message: 'Answer not found' });
@@ -59,6 +69,8 @@ export const updateAnswer = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
+    // Atnaujinimas
+
     const result = await db.collection('answers').updateOne(
       { _id: id },
       { 
@@ -69,11 +81,13 @@ export const updateAnswer = async (req, res) => {
     }
   );
 
-    // Patikrinu ar atsakymas buvo atnaujintas
+    // Patikrinimas, ar atsakymas egzistuoja
 
     if (result.matchedCount === 0) {
-      return res.status(404).json({ message: 'Answer not found' });
+      return res.status(404).json({ message: 'Answer not found' }); 
     }
+
+    // Patikrinu ar ID yra teisingas
 
     if (!id) return res.status(400).json({ message: 'Invalid ID' });
 
@@ -83,6 +97,8 @@ export const updateAnswer = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Ištrinu atsakymą pagal ID
 
 export const deleteAnswer = async (req, res) => {
   try {
@@ -102,17 +118,21 @@ export const deleteAnswer = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized to delete this answer' });
     }
 
-    const result = await db.collection('answers').deleteOne({ _id: id }); //Ištrinu atsakymą
+    // Ištrinu atsakymą
+
+    const result = await db.collection('answers').deleteOne({ _id: id }); 
     await db.collection('questions').updateOne(
          { _id: answer.questionId },
          { $inc: { answerCount: -1 } }
     );
 
+    // Patikrinu ar atsakymas buvo ištrintas
+
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'Answer not found' });
     } 
 
-    // Patikrinu ar atsakymas buvo ištrintas
+    // Patikrinu ar ID yra teisingas
 
     if (!id) return res.status(400).json({ message: 'Invalid ID' });
 

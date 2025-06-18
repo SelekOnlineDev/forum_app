@@ -78,12 +78,16 @@ const MobileMenuButton = styled(Button)`
   }
 `;
 
-const Header = () => {
-  const { user, logout } = useUser();
-  const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+// Header komponentas, skirtas puslapio viršutinei daliai su logotipu, navigacija ir vartotojo informacija
 
-  const handleLogout = () => {
+const Header = () => {
+  const { user, logout } = useUser(); 
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Būsenos kintamasis, skirtas mobiliojo meniu atidarymui/uždarymui valdyti
+
+  // Funkcija, kuri tvarko vartotojo atsijungimą
+  
+  const handleLogout = () => { 
     logout();
     navigate('/');
     setIsMobileMenuOpen(false);

@@ -28,6 +28,7 @@ const InputField = ({
   placeholder, 
   error,
   disabled = false
+  
 }) => {
   return (
     <Container>

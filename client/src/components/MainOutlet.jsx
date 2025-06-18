@@ -18,8 +18,6 @@ const OutletContainer = styled.div`
     background-position: center;
     background-attachment: fixed;
   `}
-  
-  // Responsive stiliai
 
   @media (max-width: 768px) {
     padding: 10px;

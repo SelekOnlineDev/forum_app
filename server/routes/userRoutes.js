@@ -7,7 +7,7 @@ import {
 } from '../controllers/userController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const router = express.Router(); // Sukuriu naują Express maršrutizatorių
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);

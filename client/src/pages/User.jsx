@@ -91,10 +91,14 @@ const User = () => {
     }
   }, [user, resetLogoutTimer]);
 
+  // Funkcija, kuri patikrina ar slaptažodis atitinka reikalavimus
+
   const validatePassword = (pwd) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,20}$/;
     return regex.test(pwd);
   };
+
+  // Funkcija, kuri atnaujina vartotojo profilį
 
   const handleUpdateProfile = async () => {
     const newErrors = {};
@@ -136,6 +140,8 @@ const User = () => {
     }
   };
 
+  // Funkcija, kuri keičia vartotojo slaptažodį
+  
   const handleChangePassword = async () => {
     const newErrors = {};
     

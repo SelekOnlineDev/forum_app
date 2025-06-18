@@ -22,10 +22,12 @@ const PageButton = styled.button`
   }
 `;
 
+// Puslapio numeravimo komponentas, skirtas puslapio navigacijai tvarkyti
+
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const pages = [];
 
-  for (let i = 1; i <= totalPages; i++) {
+  for (let i = 1; i <= totalPages; i++) { // Sukuriu puslapių mygtukus
     pages.push(
       <PageButton 
         key={i}

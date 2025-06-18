@@ -8,62 +8,14 @@ import answerRoutes from './routes/answerRoutes.js';
 
 dotenv.config(); // .env su visais kintamaisiais veiks nepriklausomai nuo OS ar paleidimo metodo.
 
+// Patikrinimas, ar .env faile yra apibrėžtas JWT_SECRET
+
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET is not defined in .env file');
   process.exit(1);
 };
 
-// const fixLikesDislikes = async () => {
-//   try {
-//     const db = await getDb();
-    
-//     // Pridėudu trūkstamus laukus naujiems klausimams
-    
-//     await db.collection('questions').updateMany(
-//       { 
-//         $or: [
-//           { likes: { $exists: false } },
-//           { dislikes: { $exists: false } },
-//           { likedBy: { $exists: false } },
-//           { dislikedBy: { $exists: false } }
-//         ]
-//       },
-//       { 
-//         $set: { 
-//           likes: 0,
-//           dislikes: 0,
-//           likedBy: [],
-//           dislikedBy: [] 
-//         } 
-//       }
-//     );
-
-//     const questionsToFix = await db.collection('questions').find({
-//       $or: [
-//         { likes: { $type: 'array' } },
-//         { dislikes: { $type: 'array' } }
-//       ]
-//     }).toArray();
-
-//     for (const question of questionsToFix) {
-//       await db.collection('questions').updateOne(
-//         { _id: question._id },
-//         { 
-//           $set: { 
-//             likes: Array.isArray(question.likes) ? question.likes.length : question.likes,
-//             dislikes: Array.isArray(question.dislikes) ? question.dislikes.length : question.dislikes
-//           } 
-//         }
-//       );
-//     }
-
-//     console.log('Likes and dislikes fixed successfully');
-//   } catch (err) {
-//     console.error('Error fixing likes and dislikes:', err);
-//   }
-// };
-
-// // Iškviečiu funkciją fixLikesDislikes() prieš serverio paleidimą
+// Patikrinimas, ar .env faile yra apibrėžtas DB_USER ir DB_USER_PASSWORD
 
 const app = express();
 const PORT = process.env.PORT || 5501;
@@ -82,14 +34,16 @@ app.use((req, res, next) => {
   next();
 });
 
-const mongoURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER_PASSWORD}@${process.env.DB_CLUSTER}.${process.env.DB_CLUSTER_ID}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-const client = new MongoClient(mongoURI);
+// MongoDB prisijungimo nustatymai
 
-let db = null;
+const mongoURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_USER_PASSWORD}@${process.env.DB_CLUSTER}.${process.env.DB_CLUSTER_ID}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`; // Sukuriu MongoDB URI su aplinkos kintamaisiais
+const client = new MongoClient(mongoURI); // Sukuriu MongoDB klientą su URI
+
+let db = null; // MongoDB bazės objekto nustatymas
 
 // Exportuojama funkcija, kuria naudojasi visi controlleriai
 
-export const getDb = async () => {
+export const getDb = async () => { // Funkcija, kuri grąžina MongoDB duomenų bazės objektą
   if (!db) {
     try {
       await client.connect();
@@ -103,28 +57,31 @@ export const getDb = async () => {
   return db;
 };
 
+// Funkcija, kuri taiso atsakymų skaičių kiekvienam klausimui
+
 const fixAnswerCounts = async () => {
   try {
-    const db = await getDb();
-    const questions = await db.collection('questions').find({}).toArray();
+    const db = await getDb(); // Gaunu duomenų bazę
+    const questions = await db.collection('questions').find({}).toArray(); // Gaunu visus klausimus
     
     for (const q of questions) {
-      const answerCount = await db.collection('answers')
+      const answerCount = await db.collection('answers') // Skaičiuoju atsakymų skaičių kiekvienam klausimui
         .countDocuments({ questionId: q._id });
       
-      await db.collection('questions').updateOne(
+      await db.collection('questions').updateOne( // Atlieku atnaujinimą klausimo dokumente
         { _id: q._id },
         { $set: { answerCount } }
       );
     }
-    
     console.log('Answer counts fixed!');
   } catch (err) {
     console.error('Error fixing answer counts:', err);
   }
 };
 
-const startServer = async () => {
+// Pagrindinė funkcija, kuri paleidžia serverį ir prisijungia prie DB
+
+const startServer = async () => { 
   try {
     await getDb(); // prisijungimas įvyksta prieš paleidžiant serverį
     await fixAnswerCounts(); // Ištaisau atsakymų skaičių prieš paleidžiant serverį

@@ -84,10 +84,12 @@ export default function QuestionDetail() {
   const [msg, setMsg] = useState({ text: '', error: false });
   const [showAnswerForm, setShowAnswerForm] = useState(false);
 
+  // Ši funkcija iš API nuskaito klausimo informaciją ir atsakymus
+
   const load = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/questions/${id}`);
+      const res = await api.get(`/questions/${id}`); // Nuskaitau klausimą pagal ID
       setQuestion(res.data);
       setAnswers(res.data.answers || []);
     } catch (err) {
@@ -100,6 +102,9 @@ export default function QuestionDetail() {
   useEffect(() => {
     load();
   }, [id]);
+
+  // Funkcija, kuri siunčia naują atsakymą į API
+  // Jei vartotojas neprisijungęs, nukreipia į prisijungimo puslapį
 
   const postAnswer = async () => {
     if (!user) return navigate('/login');
@@ -149,6 +154,8 @@ export default function QuestionDetail() {
     }
   };
 
+  // Funkcija, kuri ištrina atsakymą pagal ID
+  
   const deleteAnswer = async (answerId) => {
     if (window.confirm('Are you sure you want to delete this answer?')) {
       try {

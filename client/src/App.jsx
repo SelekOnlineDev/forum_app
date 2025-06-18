@@ -38,6 +38,8 @@ const AutoLogoutHandler = ({ children }) => {
   return children;
 };
 
+// Pagrindinis komponentas, kuris apima maršrutus ir modalą ir tvarko atsijungimo nukreipimą 
+
 function AppContent() {
   const { 
     showTimeoutModal, 
@@ -46,7 +48,7 @@ function AppContent() {
     setRedirectAfterLogout
   } = useUser();
   
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Naudojamas navigacijai po atsijungimo
 
   // Redirect po atsijungimo
 
@@ -57,7 +59,7 @@ function AppContent() {
     }
   }, [redirectAfterLogout, navigate, setRedirectAfterLogout]);
 
-  return (
+  return ( // Pagrindinis komponentas, kuris apima maršrutus ir modalą    
     <>
        <AutoLogoutHandler>
         <AppContainer>
@@ -85,6 +87,8 @@ function AppContent() {
     </>
   );
 }
+
+// Pagrindinis App komponentas, kuris apima maršrutus ir kontekstą
 
 function App() {
   return (
