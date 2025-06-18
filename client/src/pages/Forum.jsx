@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import QuestionCard from '../components/molecules/QuestionCard';
@@ -6,8 +6,37 @@ import SearchBar from '../components/atoms/SearchBar';
 import Button from '../components/atoms/Button';
 import Modal from '../components/molecules/Modal';
 import Pagination from '../components/molecules/Pagination';
+import LoadingSpinner from '../components/atoms/LoadingSpinner';
+import Alert from '../components/molecules/Alert';
 import styled from 'styled-components';
 import api from '../services/api';
+
+const FILTERS = {
+  ALL: 'All',
+  ANSWERED: 'Answered',
+  UNANSWERED: 'Unanswered'
+};
+
+const SORT_OPTIONS = {
+  NEWEST: 'Newest',
+  POPULAR: 'Popular'
+};
+// Funkcija, kuri gauna klausimus iš serverio
+
+const fetchQuestions = async (params) => {
+  try {
+    const res = await api.get('/questions', { params });
+    return {
+      success: true,
+      data: res.data
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.message || 'Error fetching questions'
+    };
+  }
+};
 
 const PageContainer = styled.div`
   background-image: url('/src/assets/matrix.png');
@@ -39,7 +68,7 @@ const Header = styled.div`
 const Title = styled.h2`
   border: 2px solid #00ff00;
   border-radius: 4px;
-  padding: 13px;
+  padding: 10px;
   background-color: #000;
   margin: 0;
 `;
@@ -54,6 +83,28 @@ const Filters = styled.div`
   > span {
     color: #00ff00;
     font-weight: bold;
+    min-width: 50px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 5px;
   }
 `;
 
@@ -63,6 +114,23 @@ const FilterButton = styled(Button)`
   font-size: 0.9rem;
   padding: 8px 15px;
   border: 1px solid #00ff00;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  
+  &:hover {
+    background-color: #00ff00;
+    color: #000;
+  }
+
+  @media (max-width: 768px) {
+    padding: 7px 12px;
+    font-size: 0.85rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
 `;
 
 const QuestionsList = styled.div`
@@ -89,119 +157,257 @@ const AnswerTextarea = styled.textarea`
   resize: vertical;
 `;
 
-const Forum = () => {
-  const { user } = useUser();
-  const navigate = useNavigate();
-  const [questions, setQuestions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [sort, setSort] = useState('newest');
-  const [loading, setLoading] = useState(true);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [questionToDelete, setQuestionToDelete] = useState(null);
-  const [pagination, setPagination] = useState({
+// Pradinė būsena
+
+const initialState = {
+  questions: [],
+  pagination: {
     page: 1,
     limit: 3,
     total: 0,
     totalPages: 1
-  });
-  const [refreshCounter, setRefreshCounter] = useState(0);
-  const [expandedQuestions, setExpandedQuestions] = useState({});
-  const [activeAnswerForm, setActiveAnswerForm] = useState(null);
-  const [answerContent, setAnswerContent] = useState('');
+  },
+  loading: true,
+  deleteModalOpen: false,
+  questionToDelete: null,
+  expandedQuestion: null,
+  activeAnswerForm: null,
+  answerContent: '',
+  searchTerm: '',
+  filter: FILTERS.ALL,
+  sort: SORT_OPTIONS.NEWEST,
+  error: null
+};
 
-  // Atstatau puslapį į 1 kai pasikeičia filtras
+// Reduceris, kuris tvarko forumo būseną
+// Jis apdoroja veiksmus, tokius kaip klausimų nustatymas
 
-  useEffect(() => {
-    setPagination(prev => ({ ...prev, page: 1 }));
-  }, [filter]);
+const forumReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_QUESTIONS':
+      return { ...state, questions: action.payload };
 
-  // Atstatau puslapį į 1 kai pasikeičia rūšiavimas
+    case 'SET_EXPANDED_QUESTION':
+      return { 
+        ...state, 
+         expandedQuestion: state.expandedQuestion === action.payload ? null : action.payload
+      };
+    
+    case 'SET_PAGINATION':
+      return { ...state, pagination: action.payload };
+    
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    
+    case 'TOGGLE_DELETE_MODAL':
+      return { 
+        ...state, 
+        deleteModalOpen: action.payload.open,
+        questionToDelete: action.payload.id 
+      };
+    
+    case 'TOGGLE_ANSWER_FORM':
+      return { 
+        ...state, 
+        activeAnswerForm: action.payload.id,
+        expandedQuestion: action.payload.id 
+      };
+    
+    case 'SET_ANSWER_CONTENT':
+      return { ...state, answerContent: action.payload };
+    
+    case 'SET_SEARCH_TERM':
+      return { ...state, searchTerm: action.payload };
+    
+    case 'SET_FILTER':
+      return { ...state, filter: action.payload };
+    
+    case 'SET_SORT':
+      return { ...state, sort: action.payload };
+    
+    case 'SET_PAGE':
+      return { 
+        ...state, 
+        pagination: { ...state.pagination, page: action.payload } 
+      };
+    
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    
+    case 'RESET_ANSWER_FORM':
+      return { 
+        ...state, 
+        activeAnswerForm: null, 
+        answerContent: '',
+        error: null
+      };
+    
+    case 'REFRESH_QUESTIONS':
+      return { ...state, refreshCounter: state.refreshCounter + 1 };
+    
+    default:
+      return state;
+  }
+};
 
-  useEffect(() => {
-    setPagination(prev => ({ ...prev, page: 1 }));
-  }, [sort]);
+const Forum = () => {
+  const { user } = useUser();
+  const navigate = useNavigate();
+  const [state, dispatch] = useReducer(forumReducer, initialState);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 480);
+  
+  const {
+    questions,
+    pagination,
+    loading,
+    deleteModalOpen,
+    questionToDelete,
+    expandedQuestion,
+    activeAnswerForm,
+    answerContent,
+    searchTerm,
+    filter,
+    sort,
+    error
+  } = state;
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get(
-          `/questions?page=${pagination.page}&limit=${pagination.limit}&filter=${filter}&sort=${sort}&search=${searchTerm}`
-        );
+  // Funkcija, kuri nustato mygtuko tekstą pagal mobilųjį įrenginį
+  
+  const getButtonText = (text) => {
+    if (!isMobile) return text;
+    
+    if (text === 'Most Answered') return 'Popular';
+    if (text === 'Newest') return 'Newest';
+    
+    return text.length > 8 ? text.substring(0, 6) + '..' : text;
+  };
+
+  // Klausimų įkėlimo funkcija
+  // Naudoju useCallback, kad išvengčiau nereikalingų funkcijų kūrimo
+
+  const loadQuestions = useCallback(async () => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    
+    try {
+      const result = await fetchQuestions({
+        page: pagination.page,
+        limit: pagination.limit,
+        filter,
+        sort,
+        search: searchTerm
+      });
+      
+      if (result.success) {
+        dispatch({ 
+          type: 'SET_QUESTIONS', 
+          payload: result.data.questions 
+        });
         
-        if (res.data) {
-          setQuestions(res.data.questions);
-          setPagination({
-            page: res.data.page,
-            total: res.data.total,
-            totalPages: res.data.totalPages,
+        dispatch({ 
+          type: 'SET_PAGINATION', 
+          payload: {
+            page: result.data.page,
+            total: result.data.total,
+            totalPages: result.data.totalPages,
             limit: pagination.limit
-          });
-        }
-      } catch (err) {
-        console.error('Error fetching questions:', err);
-      } finally {
-        setLoading(false);
+          }
+        });
+      } else {
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: result.message || 'Failed to load questions' 
+        });
       }
+    } catch (err) {
+      console.error(err);
+      dispatch({ 
+        type: 'SET_ERROR', 
+        payload: 'Network error. Please try again later.' 
+      });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, [pagination.page, filter, sort, searchTerm, pagination.limit]);
+
+  // Pradinis duomenų įkėlimas
+  // Naudoji useEffect, kad įkelčiau klausimus, kai komponentas yra įkeltas
+
+  useEffect(() => {
+    loadQuestions();
+  }, [loadQuestions]);
+
+  // Ekrano dydžio stebėjimas
+  // Naudoju useEffect, kad nustatyčiau, ar tai mobilus įrenginys
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 480);
     };
     
-    fetchQuestions();
-  }, [searchTerm, filter, sort, pagination.page, refreshCounter]);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleAsk = () => user ? navigate('/ask') : navigate('/login');
 
   const handleDeleteClick = id => {
-    setQuestionToDelete(id);
-    setDeleteModalOpen(true);
+    dispatch({ 
+      type: 'TOGGLE_DELETE_MODAL', 
+      payload: { open: true, id } 
+    });
   };
 
-  // // Funkcija atsakymų išskleidimui
-
-  const toggleAnswers = (questionId) => {
-    setExpandedQuestions(prev => ({
-      ...prev,
-      [questionId]: !prev[questionId]
-    }));
+  const handleShowMore = (questionId) => {
+    dispatch({
+      type: 'SET_EXPANDED_QUESTION',
+      payload: questionId
+    });
   };
 
-  // // Funkcija atsakymo formos atidarymui
-
-  const handleAnswerClick = (questionId) => {
-    // Automatiškai išskleidžiu visus atsakymus
-    setExpandedQuestions(prev => ({
-      ...prev,
-      [questionId]: true
-    }));
-    // Atidarau atsakymo formą
-    setActiveAnswerForm(questionId);
-  };
-
-   const confirmDelete = async () => {
+  const confirmDelete = async () => {
     try {
       await api.delete(`/questions/${questionToDelete}`);
-      setRefreshCounter(prev => prev + 1);
+      dispatch({ type: 'REFRESH_QUESTIONS' });
+      loadQuestions();
     } catch (err) {
       console.error(err);
+      dispatch({ 
+        type: 'SET_ERROR', 
+        payload: 'Failed to delete question' 
+      });
+    } finally {
+      dispatch({ 
+        type: 'TOGGLE_DELETE_MODAL', 
+        payload: { open: false, id: null } 
+      });
     }
-    setDeleteModalOpen(false);
   };
 
   const handleLike = async (questionId) => {
     try {
       await api.post(`/questions/${questionId}/like`);
-      setRefreshCounter(prev => prev + 1);
+      dispatch({ type: 'REFRESH_QUESTIONS' });
+      loadQuestions();
     } catch (err) {
-      console.error('Error liking question:', err);
+      console.error(err);
+      dispatch({ 
+        type: 'SET_ERROR', 
+        payload: 'Failed to like question' 
+      });
     }
   };
 
   const handleDislike = async (questionId) => {
     try {
       await api.post(`/questions/${questionId}/dislike`);
-      setRefreshCounter(prev => prev + 1);
+      dispatch({ type: 'REFRESH_QUESTIONS' });
+      loadQuestions();
     } catch (err) {
-      console.error('Error disliking question:', err);
+      console.error(err);
+      dispatch({ 
+        type: 'SET_ERROR', 
+        payload: 'Failed to dislike question' 
+      });
     }
   };
 
@@ -210,17 +416,33 @@ const Forum = () => {
       await api.post(`/questions/${questionId}/answers`, {
         content: answerContent
       });
-      setAnswerContent('');
-      setActiveAnswerForm(null);
-      setRefreshCounter(prev => prev + 1);
+      
+      dispatch({ type: 'RESET_ANSWER_FORM' });
+      dispatch({ type: 'REFRESH_QUESTIONS' });
+      loadQuestions();
     } catch (err) {
-      console.error('Error posting answer:', err);
+      console.error(err);
+      dispatch({ 
+        type: 'SET_ERROR', 
+        payload: 'Failed to post answer' 
+      });
     }
   };
+
+  useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 480);
+  };
+  
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <PageContainer>
       <ForumContainer>
+        {error && <Alert type="error" message={error} />}
+        
         <Header>
           <Title>Quantum Physics Forum</Title>
           <Button size="large" onClick={handleAsk}>
@@ -228,78 +450,130 @@ const Forum = () => {
           </Button>
         </Header>
 
-        <SearchBar onSearch={setSearchTerm} />
+        <SearchBar 
+          onSearch={(term) => dispatch({ 
+            type: 'SET_SEARCH_TERM', 
+            payload: term 
+          })} 
+        />
 
         <Filters>
-          <span>Filter:</span>
-          {['all', 'answered', 'unanswered'].map(f => (
-            <FilterButton
-              key={f}
-              $active={filter === f}
-              onClick={() => setFilter(f)}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </FilterButton>
-          ))}
+          <FilterGroup>
+            <span>Filter:</span>
+            {Object.values(FILTERS).map(f => (
+              <FilterButton
+                key={f}
+                $active={filter === f}
+                onClick={() => dispatch({ 
+                  type: 'SET_FILTER', 
+                  payload: f 
+                })}
+              >
+                {isMobile ? 
+                  (f === 'unanswered' ? 'Unans' : f.substring(0, 4)) : 
+                  f}
+              </FilterButton>
+            ))}
+          </FilterGroup>
 
-          <span>Sort:</span>
-          {['newest', 'popular'].map(s => (
-            <FilterButton
-              key={s}
-              $active={sort === s}
-              onClick={() => setSort(s)}
-            >
-              {s === 'popular' ? 'Most Answered' : 'Newest'}
-            </FilterButton>
-          ))}
+          <FilterGroup>
+            <span>Sort:</span>
+            {Object.values(SORT_OPTIONS).map(s => (
+              <FilterButton
+                key={s}
+                $active={sort === s}
+                onClick={() => dispatch({ 
+                  type: 'SET_SORT', 
+                  payload: s 
+                })}
+              >
+                {getButtonText(
+                  s === SORT_OPTIONS.POPULAR ? 'Most Answered' : 'Newest'
+                )}
+              </FilterButton>
+            ))}
+          </FilterGroup>
         </Filters>
 
-        {loading && <div style={{ color: '#00ff00', textAlign: 'center' }}>Loading questions...</div>}
-        
-        {!loading && questions.length === 0 && (
-          <div style={{ color: '#00ff00', textAlign: 'center' }}>No questions found</div>
-        )}
-
-          <QuestionsList>
-          {questions.map(question => (
-            <React.Fragment key={question._id}>
-              <QuestionCard
-                questionData={question}
-                isOwner={user && user.id === question.userId}
-                onDelete={handleDeleteClick}
-                onLike={handleLike}
-                onDislike={handleDislike}
-                onAnswer={handleAnswerClick}
-                onShowMore={toggleAnswers}
-                expanded={expandedQuestions[question._id]}
+        {loading ? (
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            margin: '20px' 
+          }}>
+            <LoadingSpinner size="40px" />
+          </div>
+        ) : (
+          <>
+            {questions.length === 0 ? (
+              <Alert 
+                type="info" 
+                message="No questions found" 
               />
-              
-             {/* Rodsu atsakymo formą tik aktyviam klausimui */}
+            ) : (
+              <QuestionsList>
+                {questions.map(question => (
+                  <React.Fragment key={question._id}>
+                    <QuestionCard
+                      questionData={question}
+                      isOwner={user && user.id === question.userId}
+                      onDelete={() => handleDeleteClick(question._id)}
+                      onLike={() => handleLike(question._id)}
+                      onDislike={() => handleDislike(question._id)}
+                      onAnswer={() => dispatch({ 
+                        type: 'TOGGLE_ANSWER_FORM', 
+                        payload: { id: question._id } 
+                      })}
+                      onShowMore={handleShowMore}
+                      expanded={expandedQuestion === question._id}
+                    />
+                    
+                    {activeAnswerForm === question._id && (
+                      <AnswerFormContainer>
+                        <AnswerTextarea
+                          value={answerContent}
+                          onChange={(e) => dispatch({ 
+                            type: 'SET_ANSWER_CONTENT', 
+                            payload: e.target.value 
+                          })}
+                          placeholder="Write your answer here..."
+                        />
+                        <div style={{ 
+                          display: 'flex', 
+                          gap: '10px', 
+                          marginTop: '10px' 
+                        }}>
+                          <Button 
+                            onClick={() => handleAnswerSubmit(question._id)}
+                          >
+                            Submit
+                          </Button>
+                          <Button 
+                            variant="danger" 
+                            onClick={() => dispatch({ 
+                              type: 'RESET_ANSWER_FORM' 
+                            })}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </AnswerFormContainer>
+                    )}
+                  </React.Fragment>
+                ))}
+              </QuestionsList>
+            )}
 
-              {activeAnswerForm === question._id && (
-                <AnswerFormContainer>
-                  <AnswerTextarea
-                    value={answerContent}
-                    onChange={(e) => setAnswerContent(e.target.value)}
-                    placeholder="Write your answer here..."
-                  />
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <Button onClick={() => handleAnswerSubmit(question._id)}>Submit</Button>
-                    <Button variant="danger" onClick={() => setActiveAnswerForm(null)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </AnswerFormContainer>
-              )}
-            </React.Fragment>
-          ))}
-        </QuestionsList>
-
-          <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
-        />
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              onPageChange={(page) => dispatch({ 
+                type: 'SET_PAGE', 
+                payload: page 
+              })}
+            />
+          </>
+        )}
 
         <Modal
           isOpen={deleteModalOpen}
@@ -308,7 +582,10 @@ const Forum = () => {
           confirmText="Delete"
           cancelText="Cancel"
           onConfirm={confirmDelete}
-          onClose={() => setDeleteModalOpen(false)}
+          onClose={() => dispatch({ 
+            type: 'TOGGLE_DELETE_MODAL', 
+            payload: { open: false, id: null } 
+          })}
         />
       </ForumContainer>
     </PageContainer>

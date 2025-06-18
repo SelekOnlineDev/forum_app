@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import Button from '../atoms/Button';
@@ -25,6 +25,11 @@ const LeftSection = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: space-between;
+  }
 `;
 
 const Logo = styled.div`
@@ -39,10 +44,6 @@ const Logo = styled.div`
       color: #33ff33;
     }
   }
-
-  @media (max-width: 768px) {
-    margin-bottom: 10px;
-  }
 `;
 
 const Navigation = styled.nav`
@@ -54,6 +55,8 @@ const Navigation = styled.nav`
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
+    display: ${({ $isMobileMenuOpen }) => $isMobileMenuOpen ? 'flex' : 'none'};
+    margin-top: 15px;
   }
 `;
 
@@ -67,44 +70,79 @@ const UserGreeting = styled.span`
   }
 `;
 
+const MobileMenuButton = styled(Button)`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+`;
+
 const Header = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-const handleLogout = () => {
-  logout();
-  navigate('/'); 
-};
-  
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <HeaderContainer>
       <LeftSection>
         <Logo>
-          <Link to="/">Secret Quantum</Link>
+          <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+            Secret Quantum
+          </Link>
         </Logo>
         
-        <Button onClick={() => navigate('/ask')} size="medium">
+        <Button 
+          onClick={() => {
+            navigate('/ask');
+            setIsMobileMenuOpen(false);
+          }} 
+          size="medium"
+        >
           Ask Question
         </Button>
+        
+        <MobileMenuButton
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          size="small"
+        >
+          {isMobileMenuOpen ? '✕' : '☰'}
+        </MobileMenuButton>
       </LeftSection>
       
-      <Navigation>
+      <Navigation $isMobileMenuOpen={isMobileMenuOpen}>
         {user ? (
           <>
             <UserGreeting>Welcome, {user.name}</UserGreeting>
-              <Button onClick={() => navigate('/user')} size="medium">
-                Profile
-              </Button>
-              <Button onClick={handleLogout} size="medium" variant="danger">
-                Log Out
-              </Button>
+            <Button 
+              onClick={() => {
+                navigate('/user');
+                setIsMobileMenuOpen(false);
+              }} 
+              size="medium"
+            >
+              Profile
+            </Button>
+            <Button 
+              onClick={handleLogout} 
+              size="medium" 
+              variant="danger"
+            >
+              Log Out
+            </Button>
           </>
         ) : (
           <>
-            <Link to="/register">
-                <Button size="medium">Sign Up</Button>
+            <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button size="medium">Sign Up</Button>
             </Link>
-            <Link to="/login">
+            <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
               <Button size="medium">Log In</Button>
             </Link>
           </>

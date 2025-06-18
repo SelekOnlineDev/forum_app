@@ -7,9 +7,9 @@ const Button = styled.button`
   border: 2px solid #000;
   border-radius: 4px;
   padding: ${({ size }) => 
-    size === 'large' ? '12px 24px' : '8px 16px'};
+    size === 'large' ? '8px 14px' : '8px 14px'};
   font-size: ${({ size }) => 
-    size === 'large' ? '1.5rem' : '1rem'};
+    size === 'large' ? '1rem' : '0.8rem'};
   cursor: pointer;
   transition: all 0.3s;
   font-weight: bold;

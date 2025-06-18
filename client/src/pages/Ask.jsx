@@ -1,108 +1,165 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import InputField from '../components/molecules/InputField';
 import Button from '../components/atoms/Button';
 import styled from 'styled-components';
 import api from '../services/api';
-import { useUser } from '../context/UserContext';
 
 const Container = styled.div`
-   background-image: url('/src/assets/matrix.png');
-   padding: 120px;
-   margin: 0;
-   height: 70vh;
-  `;
+  background-image: url('/src/assets/matrix.png');
+  padding: 120px 20px;
+  margin: 0;
+  min-height: 70vh;
+  
+  @media (max-width: 768px) {
+    padding: 60px 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 40px 10px;
+  }
+`;
 
 const AskContainer = styled.div`
   max-width: 800px;
-  margin: 0rem auto;
+  margin: 0 auto;
   padding: 25px;
   background-color: rgba(0, 0, 0, 0.8);
   border: 2px solid #00ff00;
   border-radius: 4px;
+  
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 15px;
+  }
 `;
 
 const Title = styled.h2`
   color: #00ff00;
   text-align: center;
   margin-top: 0;
+  font-size: 1.8rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.3rem;
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const Actions = styled.div`
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 const Ask = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useUser();
   const [question, setQuestion] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [forceRefresh, setForceRefresh] = useState(false);
-  
-  // Tikrinu ar redaguojamas esamas klausimas
-
-  const questionToEdit = location.state?.questionToEdit;
-
-  useEffect(() => {
-    if (questionToEdit) {
-      setQuestion(questionToEdit.question);
-    }
-  }, [questionToEdit]);
+  const { user } = useUser();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Jei vartotojas neprisijungęs, nukreipiu į login puslapį
+
     if (!user) {
-      navigate('/login');
+      navigate('/login', { state: { from: '/ask' } });
       return;
     }
     
-    if (!question || question.length < 10) {
-      setError('Question must be at least 10 characters');
+    if (!question.trim()) {
+      setError('Question cannot be empty');
       return;
     }
+    
+    setLoading(true);
+    setError('');
     
     try {
-      if (questionToEdit) {
-        // Redaguoju esamą klausimą
-        await api.patch(`/questions/${questionToEdit._id}`, { question });
-        setSuccess('Question updated successfully!');
-      } else {
-        // Kuriamas naujas klausimas
-        await api.post('/questions', { question });
-        setSuccess('Question created successfully!');
-        setForceRefresh(!forceRefresh); // Priverstinis atnaujinimas
-      }
-      
-      setTimeout(() => navigate('/forum'), 1500);
+      await api.post('/questions', { question });
+      navigate('/forum');
     } catch (err) {
-      setError(err.response?.data?.message || 'Error saving question');
+      console.error('Error posting question:', err);
+      setError('Failed to post question. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+
+    // Jei vartotojas neprisijungęs, grąžiny į pagrindinį puslapį
+    
+    if (!user) {
+      navigate('/');
+    } else {
+      navigate('/forum');
     }
   };
 
   return (
     <Container>
       <AskContainer>
-        <Title>{questionToEdit ? 'Edit Question' : 'Ask a Question'}</Title>
+        <Title>Ask a Quantum Question</Title>
         
-        <form onSubmit={handleSubmit}>
+        {error && (
+          <div style={{ color: '#666666', textAlign: 'center', marginBottom: '15px' }}>
+            {error}
+          </div>
+        )}
+        
+        <Form onSubmit={handleSubmit}>
           <InputField
-            label="Question"
+            label="Your Question"
+            as="textarea"
+            rows={5}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Enter your question"
-            error={error}
+            placeholder="Enter your quantum physics question..."
+            required
           />
           
-          {success && <div style={{ color: '#00ff00', margin: '15px 0' }}>{success}</div>}
-          
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <Button type="submit">
-              {questionToEdit ? 'Update Question' : 'Post Question'}
+          <Actions>
+            <Button 
+              type="submit" 
+              size="large"
+              disabled={loading}
+              style={{ flex: 1 }}
+            >
+              {loading ? 'Posting...' : 'Post Question'}
             </Button>
-            <Button variant="danger" onClick={() => navigate('/home')}>
+            
+            <Button 
+              type="button" 
+              variant="danger"
+              size="large"
+              onClick={handleCancel}
+              style={{ flex: 1 }}
+            >
               Cancel
             </Button>
-          </div>
-        </form>
+          </Actions>
+        </Form>
       </AskContainer>
     </Container>
   );
