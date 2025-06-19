@@ -4,7 +4,7 @@ import { getDb } from '../index.js';
 // Gaunu visus klausimus su vartotojų informacija, puslapiavimas, paieška, filtravimas ir rųšiavimas
 
 export const getAllQuestions = async (req, res) => {
-    try {
+  try {
     const db = await getDb();
     const page = parseInt(req.query.page) || 1;
     const limit = 3;
@@ -27,21 +27,29 @@ export const getAllQuestions = async (req, res) => {
 
     // Filtravimas
 
-    if (filter === 'answered') {
-      query.answerCount = { $gt: 0 };  // Tik atsakyti klausimai
-    }   
-    else if (filter === 'unanswered') {
-      query.answerCount = { $eq: 0 };  // Tik neatsakyti klausimai
+    if (filter && typeof filter === 'string') {
+      const normalizedFilter = filter.toLowerCase();
+      
+      if (normalizedFilter === 'answered') {
+        query.answerCount = { $gt: 0 };
+      } else if (normalizedFilter === 'unanswered') {
+        query.answerCount = { $eq: 0 };
+      }
     }
     
-    // Rųšiavimas
+    // Rūšiavimas
 
-    let sortOption = { createdAt: -1 }; // Default: naujausi viršuje
-    if (sort === 'popular') {
-      sortOption = { 
-        answerCount: -1, // Daugiausiai atsakymų viršuje
-        createdAt: -1    // Jei vienodas atsakymų sk. - naujesni viršuje
-      };
+    let sortOption = { createdAt: -1 };
+    
+    if (sort && typeof sort === 'string') {
+      const normalizedSort = sort.toLowerCase();
+      
+      if (normalizedSort === 'popular') {
+        sortOption = { 
+          answerCount: -1,
+          createdAt: -1
+        };
+      }
     }
     
     // Gaunu klausimus su vartotojų informacija

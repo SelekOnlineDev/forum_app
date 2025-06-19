@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Input from '../atoms/Input'; 
 
 const SearchContainer = styled.div`
   display: flex;

@@ -4,8 +4,6 @@ import { useUser } from '../context/UserContext';
 import Button from '../components/atoms/Button';
 import styled from 'styled-components';
 
-
-
 const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;
