@@ -2,6 +2,7 @@
 Quantum Physics Forum
 
 EN
+
 About the project:
 Quantum Physics Forum is a Q&A platform for discussions about quantum physics. The project uses the following technologies:
 Backend: Node.js, ExpressJS, MongoDB, JWT authentication, UUID.
@@ -82,7 +83,10 @@ Edit profile information form
 Change password form
 Save buttons
 
+
+
 LT
+
 Apie projektą:
 Quantum Physics Forum yra klausimų-atsakymų platforma, skirta diskusijoms apie kvantinę fiziką. Projekte naudojama ši technologijų:
 Backend: Node.js, ExpressJS, MongoDB, JWT autentifikacija, UUID.
